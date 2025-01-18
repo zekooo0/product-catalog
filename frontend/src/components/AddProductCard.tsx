@@ -36,7 +36,8 @@ type Reviewer = {
 };
 
 const productSchema = z.object({
-  imageUrl: z.string().url("Please enter a valid URL"),
+  imageUrl: z.string().optional(),
+  imageFile: z.any().optional(),
   domainName: z.string(),
   url: z.string().url("Please enter a valid URL"),
   description: z.string().min(10, "Description must be at least 10 characters"),
@@ -49,8 +50,19 @@ const productSchema = z.object({
     })
   ),
   keywords: z.array(z.string()),
-  category: z.array(z.string()),
+  categories: z.array(z.string()),
 });
+// .refine(
+//   (data) => {
+//     const hasImageUrl = !!data.imageUrl && data.imageUrl.trim() !== "";
+//     const hasImageFile = !!data.imageFile;
+//     return hasImageUrl !== hasImageFile; // XOR - exactly one must be true
+//   },
+//   {
+//     message: "Please provide either an image URL or upload a file, not both",
+//     path: ["imageUrl"],
+//   }
+// );
 
 type ProductFormValues = z.infer<typeof productSchema>;
 
@@ -61,11 +73,14 @@ const AddProductCard = ({ mutateProducts }: { mutateProducts: () => void }) => {
     name: "",
     url: "",
   });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
     defaultValues: {
       imageUrl: "",
+      imageFile: null,
       domainName: "",
       url: "",
       description: "",
@@ -73,7 +88,7 @@ const AddProductCard = ({ mutateProducts }: { mutateProducts: () => void }) => {
       freeTrial: false,
       reviewers: [],
       keywords: [],
-      category: [],
+      categories: [],
     },
   });
 
@@ -87,8 +102,8 @@ const AddProductCard = ({ mutateProducts }: { mutateProducts: () => void }) => {
 
   const handleAddCategory = () => {
     if (categoryInput.trim()) {
-      const currentCategories = form.getValues("category");
-      form.setValue("category", [...currentCategories, categoryInput.trim()]);
+      const currentCategories = form.getValues("categories");
+      form.setValue("categories", [...currentCategories, categoryInput.trim()]);
       setCategoryInput("");
     }
   };
@@ -113,9 +128,9 @@ const AddProductCard = ({ mutateProducts }: { mutateProducts: () => void }) => {
   };
 
   const handleRemoveCategory = (index: number) => {
-    const currentCategories = form.getValues("category");
+    const currentCategories = form.getValues("categories");
     form.setValue(
-      "category",
+      "categories",
       currentCategories.filter((_, i) => i !== index)
     );
   };
@@ -131,17 +146,61 @@ const AddProductCard = ({ mutateProducts }: { mutateProducts: () => void }) => {
 
   const onSubmit = async (data: ProductFormValues) => {
     const token = window.localStorage.getItem("authToken") ?? "";
-    const transformedData = {
-      ...data,
-      domainName: data.url.split("/")[2],
-      imageURL: data.imageUrl,
-      freeTrialAvailable: data.freeTrial,
-      category: data.category,
-    };
-    console.log(transformedData);
-    await productsApi.createProduct(token, transformedData);
+
+    // Create FormData if we have a file
+    if (selectedFile) {
+      const formData = new FormData();
+
+      // Add basic string fields
+      formData.append("url", data.url);
+      formData.append("description", data.description);
+      formData.append("rating", data.rating.toString());
+      formData.append("freeTrial", data.freeTrial.toString());
+      formData.append("domainName", data.url.split("/")[2]);
+
+      // Add arrays as JSON strings
+      formData.append(
+        "categories",
+        JSON.stringify(
+          data.categories.map((categoryName) => ({
+            name: categoryName,
+          }))
+        )
+      );
+      formData.append("reviewers", JSON.stringify(data.reviewers));
+      formData.append("keywords", JSON.stringify(data.keywords));
+
+      // Add the file last
+      formData.append("image", selectedFile);
+
+      await productsApi.createProduct(token, formData);
+    } else {
+      // If no file, send as regular JSON
+      const transformedData = {
+        imageURL: selectedFile ? "" : data.imageUrl || "",
+        domainName: data.url.split("/")[2],
+        url: data.url,
+        description: data.description,
+        rating: data.rating,
+        freeTrialAvailable: data.freeTrial,
+        categories: data.categories.map((categoryName) => ({
+          name: categoryName,
+        })),
+        reviewers: data.reviewers,
+        keywords: data.keywords,
+      };
+      await productsApi.createProduct(token, transformedData);
+    }
     form.reset();
+    setSelectedFile(null);
+    setImagePreview(null);
     mutateProducts();
+  };
+
+  const onClose = () => {
+    form.reset();
+    setSelectedFile(null);
+    setImagePreview(null);
   };
 
   return (
@@ -157,31 +216,77 @@ const AddProductCard = ({ mutateProducts }: { mutateProducts: () => void }) => {
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 ">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-4 "
+            id="add-product-form"
+          >
             <FormField
               control={form.control}
               name="imageUrl"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Banner Image URL</FormLabel>
+                  <FormLabel>Product Image</FormLabel>
                   <FormControl>
-                    <div>
-                      <Input
-                        placeholder="https://example.com/image.jpg"
-                        {...field}
-                        className="mb-2"
-                      />
-                      {field.value &&
-                        z.string().url().safeParse(field.value).success && (
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <FormLabel className="text-sm font-normal">
+                          Option 1: Enter Image URL
+                        </FormLabel>
+                        <Input
+                          placeholder="https://example.com/image.jpg"
+                          {...field}
+                          onChange={(e) => {
+                            field.onChange(e);
+                            if (e.target.value) {
+                              setSelectedFile(null);
+                              setImagePreview(null);
+                            }
+                          }}
+                          disabled={!!selectedFile}
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <FormLabel className="text-sm font-normal">
+                          Option 2: Upload Image File
+                        </FormLabel>
+                        <Input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              setSelectedFile(file);
+                              field.onChange(""); // Clear URL field
+                              // Create preview URL
+                              const reader = new FileReader();
+                              reader.onloadend = () => {
+                                setImagePreview(reader.result as string);
+                              };
+                              reader.readAsDataURL(file);
+                            }
+                          }}
+                          disabled={!!field.value}
+                        />
+                      </div>
+
+                      {/* Preview area */}
+                      {(field.value || imagePreview) && (
+                        <div className="mt-4">
+                          <FormLabel className="text-sm font-normal">
+                            Preview:
+                          </FormLabel>
                           <Image
-                            src={field.value}
+                            src={imagePreview || field.value || ""}
                             alt="Preview"
                             width={0}
                             height={0}
                             sizes="100vw"
-                            className="w-full h-auto"
+                            className="w-full h-auto mt-2"
                           />
-                        )}
+                        </div>
+                      )}
                     </div>
                   </FormControl>
                   <FormMessage />
@@ -352,7 +457,7 @@ const AddProductCard = ({ mutateProducts }: { mutateProducts: () => void }) => {
 
             <FormField
               control={form.control}
-              name="category"
+              name="categories"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Categories</FormLabel>
@@ -390,12 +495,16 @@ const AddProductCard = ({ mutateProducts }: { mutateProducts: () => void }) => {
                 </FormItem>
               )}
             />
-            <DialogFooter>
-              <Button variant="outline">Cancel</Button>
-              <Button type="submit">Save Product</Button>
-            </DialogFooter>
           </form>
         </Form>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button type="submit" form="add-product-form">
+            Save Product
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

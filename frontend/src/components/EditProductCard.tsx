@@ -27,7 +27,7 @@ import {
   FormMessage,
 } from "./ui/form";
 import { Pencil, X } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { productsApi } from "@/lib/api";
 import { Product } from "@/lib/types";
 
@@ -50,7 +50,7 @@ const productSchema = z.object({
     })
   ),
   keywords: z.array(z.string()),
-  category: z.array(z.string()),
+  categories: z.array(z.string()),
 });
 
 type ProductFormValues = z.infer<typeof productSchema>;
@@ -68,6 +68,7 @@ const EditProductCard = ({
     name: "",
     url: "",
   });
+  const [open, setOpen] = useState(false);
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
@@ -80,7 +81,7 @@ const EditProductCard = ({
       freeTrial: product.freeTrialAvailable,
       reviewers: product.reviewers,
       keywords: product.keywords,
-      category: product.category,
+      categories: product.categories.map((category) => category.name),
     },
   });
 
@@ -94,8 +95,8 @@ const EditProductCard = ({
 
   const handleAddCategory = () => {
     if (categoryInput.trim()) {
-      const currentCategories = form.getValues("category");
-      form.setValue("category", [...currentCategories, categoryInput.trim()]);
+      const currentCategories = form.getValues("categories");
+      form.setValue("categories", [...currentCategories, categoryInput.trim()]);
       setCategoryInput("");
     }
   };
@@ -120,9 +121,9 @@ const EditProductCard = ({
   };
 
   const handleRemoveCategory = (index: number) => {
-    const currentCategories = form.getValues("category");
+    const currentCategories = form.getValues("categories");
     form.setValue(
-      "category",
+      "categories",
       currentCategories.filter((_, i) => i !== index)
     );
   };
@@ -143,15 +144,36 @@ const EditProductCard = ({
       domainName: data.url.split("/")[2],
       imageURL: data.imageUrl,
       freeTrialAvailable: data.freeTrial,
-      category: data.category,
+      categories: data.categories.map((category) => category.name),
     };
-    await productsApi.createProduct(token, transformedData);
+    await productsApi.updateProduct(
+      token,
+      product._id as string,
+      transformedData
+    );
     form.reset();
     mutateProducts();
+    setOpen(false);
   };
 
+  useEffect(() => {
+    if (open) {
+      form.reset({
+        imageUrl: product.imageURL,
+        domainName: product.domainName,
+        url: product.url,
+        description: product.description,
+        rating: product.rating,
+        freeTrial: product.freeTrialAvailable,
+        reviewers: product.reviewers,
+        keywords: product.keywords,
+        categories: product.categories.map((category) => category.name),
+      });
+    }
+  }, [open, product, form]);
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" className="flex items-center gap-2">
           <Pencil size={16} /> Edit Product
@@ -360,7 +382,7 @@ const EditProductCard = ({
 
             <FormField
               control={form.control}
-              name="category"
+              name="categories"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Categories</FormLabel>
@@ -386,7 +408,7 @@ const EditProductCard = ({
                   <div className="flex gap-2 mt-2 flex-wrap">
                     {field.value.map((category, index) => (
                       <Badge key={index} variant="secondary" className="gap-2">
-                        {category.name}
+                        {category}
                         <X
                           className="h-4 w-4 cursor-pointer"
                           onClick={() => handleRemoveCategory(index)}

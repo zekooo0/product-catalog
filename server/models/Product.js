@@ -47,9 +47,9 @@ const productSchema = new mongoose.Schema(
         trim: true,
       },
     ],
-    category: [
+    categories: [
       {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
         ref: "Category",
         required: true,
       },

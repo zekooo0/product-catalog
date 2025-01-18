@@ -1,4 +1,4 @@
-import { MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { MoreVertical, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { Badge } from "./ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
@@ -63,7 +63,7 @@ const ProductCard = ({ product, mutateProducts }: ProductCardProps) => {
         </p>
 
         <div className="flex flex-wrap gap-2 px-4">
-          {product.category.map((category, index) => (
+          {product.categories.map((category, index) => (
             <Badge key={index} variant="secondary">
               {category.name}
             </Badge>
