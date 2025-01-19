@@ -52,17 +52,6 @@ const productSchema = z.object({
   keywords: z.array(z.string()),
   categories: z.array(z.string()),
 });
-// .refine(
-//   (data) => {
-//     const hasImageUrl = !!data.imageUrl && data.imageUrl.trim() !== "";
-//     const hasImageFile = !!data.imageFile;
-//     return hasImageUrl !== hasImageFile; // XOR - exactly one must be true
-//   },
-//   {
-//     message: "Please provide either an image URL or upload a file, not both",
-//     path: ["imageUrl"],
-//   }
-// );
 
 type ProductFormValues = z.infer<typeof productSchema>;
 
@@ -183,9 +172,7 @@ const AddProductCard = ({ mutateProducts }: { mutateProducts: () => void }) => {
         description: data.description,
         rating: data.rating,
         freeTrialAvailable: data.freeTrial,
-        categories: data.categories.map((categoryName) => ({
-          name: categoryName,
-        })),
+        categories: data.categories,
         reviewers: data.reviewers,
         keywords: data.keywords,
       };

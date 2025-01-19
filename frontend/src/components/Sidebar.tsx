@@ -1,19 +1,22 @@
-import { Category } from "@/lib/types";
-import { cn } from "@/lib/utils";
+import { cn, fetcher } from "@/lib/utils";
+import useSWR from "swr";
 
 const Sidebar = ({
-  categories,
-  categoriesLoading,
-  categoriesError,
   selectedCategory,
   onCategorySelect,
 }: {
-  categories: Category[];
-  categoriesLoading: boolean;
-  categoriesError: Error | null;
   selectedCategory: string | null;
   onCategorySelect: (category: string | null) => void;
 }) => {
+  const {
+    data: categories,
+    error: categoriesError,
+    isLoading: categoriesLoading,
+  } = useSWR<string[]>(
+    "http://localhost:5000/api/products/categories",
+    fetcher
+  );
+
   if (categoriesLoading) {
     return <div className="p-5">Loading...</div>;
   }
@@ -36,18 +39,18 @@ const Sidebar = ({
         )}
       </div>
       <ul className="space-y-2">
-        {categories?.map((category) => (
+        {categories?.map((category, index) => (
           <li
-            key={category._id}
-            onClick={() => onCategorySelect(category.name)}
+            key={index}
+            onClick={() => onCategorySelect(category)}
             className={cn(
               "cursor-pointer py-2 px-3 rounded-md transition-colors",
-              selectedCategory === category.name
+              selectedCategory === category
                 ? "bg-blue-500 text-white"
                 : "hover:bg-gray-100"
             )}
           >
-            {category.name}
+            {category}
           </li>
         ))}
       </ul>

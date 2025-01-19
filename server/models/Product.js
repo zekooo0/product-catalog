@@ -47,13 +47,7 @@ const productSchema = new mongoose.Schema(
         trim: true,
       },
     ],
-    categories: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Category",
-        required: true,
-      },
-    ],
+    categories: [String],
   },
   {
     timestamps: true,

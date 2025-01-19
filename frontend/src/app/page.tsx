@@ -3,7 +3,7 @@
 import Header from "@/components/Header";
 import Products from "@/components/Products";
 import Sidebar from "@/components/Sidebar";
-import { Category, Product } from "@/lib/types";
+import { Product } from "@/lib/types";
 import { fetcher } from "@/lib/utils";
 import { useState } from "react";
 import useSWR from "swr";
@@ -30,12 +30,6 @@ export default function Page() {
     mutate: mutateProducts,
   } = useSWR<Product[]>(apiUrl, fetcher);
 
-  const {
-    data: categories,
-    error: categoriesError,
-    isLoading: categoriesLoading,
-  } = useSWR<Category[]>("http://localhost:5000/api/categories", fetcher);
-
   return (
     <div className="relative">
       <Header
@@ -44,9 +38,9 @@ export default function Page() {
       />
       <div className="flex w-full">
         <Sidebar
-          categories={categories || []}
-          categoriesLoading={categoriesLoading}
-          categoriesError={categoriesError}
+          // categories={categories || []}
+          // categoriesLoading={categoriesLoading}
+          // categoriesError={categoriesError}
           selectedCategory={selectedCategory}
           onCategorySelect={setSelectedCategory}
         />

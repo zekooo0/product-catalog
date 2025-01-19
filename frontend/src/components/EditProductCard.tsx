@@ -81,7 +81,7 @@ const EditProductCard = ({
       freeTrial: product.freeTrialAvailable,
       reviewers: product.reviewers,
       keywords: product.keywords,
-      categories: product.categories.map((category) => category.name),
+      categories: product.categories,
     },
   });
 
@@ -144,7 +144,7 @@ const EditProductCard = ({
       domainName: data.url.split("/")[2],
       imageURL: data.imageUrl,
       freeTrialAvailable: data.freeTrial,
-      categories: data.categories.map((category) => category.name),
+      categories: data.categories,
     };
     await productsApi.updateProduct(
       token,
@@ -167,7 +167,7 @@ const EditProductCard = ({
         freeTrial: product.freeTrialAvailable,
         reviewers: product.reviewers,
         keywords: product.keywords,
-        categories: product.categories.map((category) => category.name),
+        categories: product.categories,
       });
     }
   }, [open, product, form]);

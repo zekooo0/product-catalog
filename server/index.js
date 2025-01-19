@@ -5,7 +5,6 @@ const cors = require("cors");
 const morgan = require("morgan");
 const authRoutes = require("./routes/auth");
 const productRoutes = require("./routes/products");
-const categoryRoutes = require("./routes/categories");
 
 const app = express();
 
@@ -23,7 +22,6 @@ mongoose
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
-app.use("/api/categories", categoryRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

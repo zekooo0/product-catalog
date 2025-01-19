@@ -1,5 +1,4 @@
 const Product = require("../models/Product");
-const Category = require("../models/Category");
 const { validationResult } = require("express-validator");
 const cloudinary = require("../config/cloudinary");
 const DatauriParser = require("datauri/parser");
@@ -51,10 +50,7 @@ exports.getProducts = async (req, res) => {
     let query = {};
     // Category filter
     if (req.query.category) {
-      const category = await Category.findOne({ name: req.query.category });
-      if (category) {
-        query.categories = category._id;
-      }
+      query.categories = { $in: [req.query.category] };
     }
 
     // Letter filter
@@ -81,8 +77,7 @@ exports.getProducts = async (req, res) => {
     }
 
     const products = await Product.find(query)
-      .populate("categories")
-      .sort(req.query.sort || "-createdAt");
+    .sort(req.query.sort || "-createdAt");
 
     res.json(products);
   } catch (error) {
@@ -94,9 +89,7 @@ exports.getProducts = async (req, res) => {
 // Get single product
 exports.getProduct = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id).populate(
-      "categories"
-    );
+    const product = await Product.findById(req.params.id);
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
@@ -109,10 +102,10 @@ exports.getProduct = async (req, res) => {
 // Create product
 exports.createProduct = async (req, res) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
+    // const errors = validationResult(req);
+    // if (!errors.isEmpty()) {
+    //   return res.status(400).json({ errors: errors.array() });
+    // }
 
     let imageURL = req.body.imageURL;
 
@@ -126,10 +119,18 @@ exports.createProduct = async (req, res) => {
     }
 
     // Parse JSON strings from FormData if they exist
-    const categories =
-      typeof req.body.categories === "string"
-        ? JSON.parse(req.body.categories)
-        : req.body.categories;
+    let categories = req.body.categories;
+    if (typeof categories === "string") {
+      try {
+        categories = JSON.parse(categories);
+        // Ensure categories is an array of strings
+        if (Array.isArray(categories)) {
+          categories = categories.map(cat => typeof cat === 'string' ? cat : cat.name || '');
+        }
+      } catch (e) {
+        categories = [];
+      }
+    }
 
     const reviewers =
       typeof req.body.reviewers === "string"
@@ -143,17 +144,6 @@ exports.createProduct = async (req, res) => {
 
     const { domainName, url, description, rating, freeTrial } = req.body;
 
-    // Handle categories - create if they don't exist and get their IDs
-    const categoryIds = [];
-    for (const categoryObj of categories) {
-      let categoryDoc = await Category.findOne({ name: categoryObj.name });
-      if (!categoryDoc) {
-        // Create new category if it doesn't exist
-        categoryDoc = await Category.create({ name: categoryObj.name });
-      }
-      categoryIds.push(categoryDoc._id);
-    }
-
     // Transform the data to match the schema
     const productData = {
       imageURL,
@@ -164,7 +154,7 @@ exports.createProduct = async (req, res) => {
       freeTrialAvailable: freeTrial === "true" || freeTrial === true,
       reviewers,
       keywords,
-      categories: categoryIds,
+      categories,
     };
     const product = await Product.create(productData);
     res.status(201).json(product);
@@ -178,7 +168,6 @@ exports.createProduct = async (req, res) => {
 exports.updateProduct = async (req, res) => {
   try {
     let updateData = { ...req.body };
-
     // Handle file upload if present
     if (req.file) {
       updateData.imageURL = await uploadToCloudinary(req.file);
@@ -225,19 +214,21 @@ exports.deleteProduct = async (req, res) => {
     // Delete the product
     await product.deleteOne();
 
-    // Delete orphaned categories
-    for (const categoryId of product.categories) {
-      const productsInCategory = await Product.countDocuments({
-        categories: categoryId,
-      });
-      if (productsInCategory === 0) {
-        await Category.findByIdAndDelete(categoryId);
-      }
-    }
-
     res.json({ message: "Product deleted successfully" });
   } catch (error) {
     console.error("Error in delete product:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Get all unique categories
+exports.getCategories = async (req, res) => {
+  try {
+    const products = await Product.find({}, 'categories');
+    const uniqueCategories = [...new Set(products.flatMap(product => product.categories))];
+    res.json(uniqueCategories);
+  } catch (error) {
+    console.error("Error getting categories:", error);
     res.status(500).json({ message: "Server error" });
   }
 };

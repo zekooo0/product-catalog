@@ -26,7 +26,7 @@ export interface Product {
     url: string;
   }>;
   keywords: string[];
-  categories: Category[];
+  categories: string[];
   createdAt?: string;
   updatedAt?: string;
 }

@@ -6,6 +6,7 @@ const {
   createProduct,
   updateProduct,
   deleteProduct,
+  getCategories,
 } = require("../controllers/productController");
 const {
   createProductValidator,
@@ -18,6 +19,9 @@ const upload = require("../middleware/upload");
 
 // Get all products with optional filtering and search
 router.get("/", getProducts);
+
+// Get all unique categories
+router.get("/categories", getCategories);
 
 // Get single product
 router.get("/:id", getProductValidator, getProduct);
@@ -37,7 +41,7 @@ router.put(
   "/:id",
   protect,
   authorize("admin"),
-  updateProductValidator,
+  // updateProductValidator,
   upload.single("image"),
   updateProduct
 );
