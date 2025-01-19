@@ -44,7 +44,7 @@ const ProductImage = ({
   freeTrail: boolean;
 }) => (
   <div className="relative h-[200px] w-full border-b ">
-    <a target="_blank" rel="noopener noreferrer" href={url}>
+    <a target="_blank" href={url}>
       <Image
         src={imageURL}
         alt={domainName}
@@ -68,11 +68,12 @@ const ProductHeader = ({
   rating: number;
 }) => (
   <div className="flex items-start justify-between px-4">
-    <h3 className="font-semibold text-xl">
-      <a target="_blank" rel="noopener noreferrer" href={url}>
+    <a target="_blank" href={url}>
+      <h2 className="scroll-m-20 text-xl font-bold tracking-tight">
         {domainName}
-      </a>
-    </h3>
+      </h2>
+      my-5
+    </a>
     <div className="flex items-center gap-1">
       <span className="font-bold text-lg">{rating}</span>
       <span className="text-lg">/10</span>
@@ -140,7 +141,6 @@ const ProductReviewers = ({
             className="text-primary hover:underline font-bold"
             href={reviewer.url}
             target="_blank"
-            rel="noopener noreferrer"
           >
             {reviewer.name}
           </a>
@@ -163,7 +163,6 @@ const ProductReviewers = ({
                   className=" hover:underline"
                   href={reviewer.url}
                   target="_blank"
-                  rel="noopener noreferrer"
                 >
                   {reviewer.name}
                 </a>
