@@ -3,6 +3,7 @@
 import Header from "@/components/Header";
 import Products from "@/components/Products";
 import Sidebar from "@/components/Sidebar";
+import { API_BASE_URL } from "@/lib/config";
 import { Product } from "@/lib/types";
 import { fetcher } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
@@ -17,7 +18,7 @@ export default function ProductsPage() {
   const search = searchParams.get("search");
 
   // Construct the API URL with filters
-  const apiUrl = `http://localhost:5000/api/products${
+  const apiUrl = `${API_BASE_URL}/products${
     selectedCategory || selectedLetter || search
       ? "?" +
         new URLSearchParams({

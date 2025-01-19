@@ -1,6 +1,7 @@
 import { cn, fetcher } from "@/lib/utils";
 import useSWR from "swr";
 import LoadingSpinner from "./LoadingSpinner";
+import { API_BASE_URL } from "@/lib/config";
 
 const Sidebar = ({
   selectedCategory,
@@ -14,7 +15,7 @@ const Sidebar = ({
     error: categoriesError,
     isLoading: categoriesLoading,
   } = useSWR<{ category: string; count: number }[]>(
-    "http://localhost:5000/api/products/categories",
+    `${API_BASE_URL}/products/categories`,
     fetcher
   );
 
