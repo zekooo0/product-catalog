@@ -63,7 +63,11 @@ exports.getProducts = async (req, res) => {
 
     // Search functionality
     if (req.query.search) {
-      query.$text = { $search: req.query.search };
+      query.$or = [
+        { domainName: { $regex: req.query.search, $options: 'i' } },
+        { description: { $regex: req.query.search, $options: 'i' } },
+        { categories: { $regex: req.query.search, $options: 'i' } }
+      ];
     }
 
     // Rating filter
@@ -75,7 +79,7 @@ exports.getProducts = async (req, res) => {
     if (req.query.freeTrialAvailable) {
       query.freeTrialAvailable = req.query.freeTrialAvailable === "true";
     }
-
+    console.log(query);
     const products = await Product.find(query).sort(
       req.query.sort || "-createdAt"
     );
@@ -228,7 +232,6 @@ exports.deleteProduct = async (req, res) => {
 exports.getCategories = async (req, res) => {
   try {
     const products = await Product.find({}, "categories");
-    console.log(products);
     const uniqueCategories = [
       ...new Set(products.flatMap((product) => product.categories)),
     ];

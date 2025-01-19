@@ -5,6 +5,7 @@ import Products from "@/components/Products";
 import Sidebar from "@/components/Sidebar";
 import { Product } from "@/lib/types";
 import { fetcher } from "@/lib/utils";
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import useSWR from "swr";
 
@@ -12,13 +13,18 @@ export default function Page() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedLetter, setSelectedLetter] = useState<string>("");
 
+  const searchParams = useSearchParams();
+
+  const search = searchParams.get("search");
+
   // Construct the API URL with filters
   const apiUrl = `http://localhost:5000/api/products${
-    selectedCategory || selectedLetter
+    selectedCategory || selectedLetter || search
       ? "?" +
         new URLSearchParams({
           ...(selectedCategory && { category: selectedCategory }),
           ...(selectedLetter && { letter: selectedLetter }),
+          ...(search && { search }),
         }).toString()
       : ""
   }`;

@@ -1,5 +1,6 @@
 import { cn, fetcher } from "@/lib/utils";
 import useSWR from "swr";
+import LoadingSpinner from "./LoadingSpinner";
 
 const Sidebar = ({
   selectedCategory,
@@ -18,7 +19,11 @@ const Sidebar = ({
   );
 
   if (categoriesLoading) {
-    return <div className="p-5">Loading...</div>;
+    return (
+      <div className="flex justify-center w-[200px]">
+        <LoadingSpinner />
+      </div>
+    );
   }
 
   if (categoriesError) {

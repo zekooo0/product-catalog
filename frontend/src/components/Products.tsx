@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/auth-context";
 import AddProductCard from "./AddProductCard";
 import ProductCard from "./ProductCard";
 import { Product } from "@/lib/types";
+import LoadingSpinner from "./LoadingSpinner";
 
 const Products = ({
   products,
@@ -20,7 +21,11 @@ const Products = ({
 
   // Handle loading states
   if (productsLoading) {
-    return <div className="p-5">Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-[70vh]">
+        <LoadingSpinner />
+      </div>
+    );
   }
 
   // Handle errors
