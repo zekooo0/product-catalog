@@ -49,7 +49,6 @@ const getCloudinaryPublicId = (url) => {
 exports.getProducts = async (req, res) => {
   try {
     let query = {};
-    console.log(req.query);
     // Category filter
     if (req.query.category) {
       const category = await Category.findOne({ name: req.query.category });
@@ -121,33 +120,28 @@ exports.createProduct = async (req, res) => {
     if (req.file) {
       imageURL = await uploadToCloudinary(req.file);
     } else if (!isValidUrl(imageURL)) {
-      return res
-        .status(400)
-        .json({
-          message: "Please provide a valid image URL or upload an image file",
-        });
+      return res.status(400).json({
+        message: "Please provide a valid image URL or upload an image file",
+      });
     }
 
     // Parse JSON strings from FormData if they exist
-    const categories = typeof req.body.categories === 'string' 
-      ? JSON.parse(req.body.categories) 
-      : req.body.categories;
-    
-    const reviewers = typeof req.body.reviewers === 'string'
-      ? JSON.parse(req.body.reviewers)
-      : req.body.reviewers;
-    
-    const keywords = typeof req.body.keywords === 'string'
-      ? JSON.parse(req.body.keywords)
-      : req.body.keywords;
+    const categories =
+      typeof req.body.categories === "string"
+        ? JSON.parse(req.body.categories)
+        : req.body.categories;
 
-    const {
-      domainName,
-      url,
-      description,
-      rating,
-      freeTrial,
-    } = req.body;
+    const reviewers =
+      typeof req.body.reviewers === "string"
+        ? JSON.parse(req.body.reviewers)
+        : req.body.reviewers;
+
+    const keywords =
+      typeof req.body.keywords === "string"
+        ? JSON.parse(req.body.keywords)
+        : req.body.keywords;
+
+    const { domainName, url, description, rating, freeTrial } = req.body;
 
     // Handle categories - create if they don't exist and get their IDs
     const categoryIds = [];
@@ -167,12 +161,11 @@ exports.createProduct = async (req, res) => {
       url,
       description,
       rating: Number(rating),
-      freeTrialAvailable: freeTrial === 'true' || freeTrial === true,
+      freeTrialAvailable: freeTrial === "true" || freeTrial === true,
       reviewers,
       keywords,
       categories: categoryIds,
     };
-    console.log(productData);
     const product = await Product.create(productData);
     res.status(201).json(product);
   } catch (error) {
@@ -190,11 +183,9 @@ exports.updateProduct = async (req, res) => {
     if (req.file) {
       updateData.imageURL = await uploadToCloudinary(req.file);
     } else if (req.body.imageURL && !isValidUrl(req.body.imageURL)) {
-      return res
-        .status(400)
-        .json({
-          message: "Please provide a valid image URL or upload an image file",
-        });
+      return res.status(400).json({
+        message: "Please provide a valid image URL or upload an image file",
+      });
     }
 
     const product = await Product.findByIdAndUpdate(req.params.id, updateData, {

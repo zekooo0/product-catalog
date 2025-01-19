@@ -38,8 +38,8 @@ const ProductCard = ({ product, mutateProducts }: ProductCardProps) => {
   };
 
   return (
-    <div className="rounded-lg border bg-card text-card-foreground shadow-sm overflow-hidden">
-      <div className="relative h-[200px] w-full">
+    <div className="rounded-lg border bg-card text-card-foreground shadow-sm overflow-hidden hover:shadow hover:shadow-card hover:scale-105 transition-all duration-300">
+      <div className="relative h-[200px] w-full border-b">
         <Image
           src={product.imageURL}
           alt={product.domainName}
@@ -49,7 +49,7 @@ const ProductCard = ({ product, mutateProducts }: ProductCardProps) => {
         />
       </div>
 
-      <div className=" space-y-3 ">
+      <div className=" space-y-3 py-2">
         <div className="flex items-start justify-between px-4">
           <h3 className="font-semibold text-xl">{product.domainName}</h3>
           <div className="flex items-center gap-1">
