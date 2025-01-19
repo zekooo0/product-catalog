@@ -36,21 +36,25 @@ const ProductImage = ({
   url,
   imageURL,
   domainName,
+  freeTrail,
 }: {
   url: string;
   imageURL: string;
   domainName: string;
+  freeTrail: boolean;
 }) => (
-  <div className="relative h-[200px] w-full border-b">
+  <div className="relative h-[200px] w-full border-b ">
     <a target="_blank" rel="noopener noreferrer" href={url}>
       <Image
         src={imageURL}
         alt={domainName}
         fill
-        className="object-cover"
+        className="object-cover bg-blend-multiply"
         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
       />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
     </a>
+    {freeTrail && <Badge className="absolute top-2 right-2">Free Trail</Badge>}
   </div>
 );
 
@@ -215,6 +219,7 @@ const ProductCard = ({ product, mutateProducts }: ProductCardProps) => {
         url={product.url}
         imageURL={product.imageURL}
         domainName={product.domainName}
+        freeTrail={product.freeTrialAvailable === true}
       />
 
       <div className=" flex flex-col justify-between flex-1 py-4 space-y-2">

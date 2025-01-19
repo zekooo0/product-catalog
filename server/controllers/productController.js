@@ -76,8 +76,9 @@ exports.getProducts = async (req, res) => {
       query.freeTrialAvailable = req.query.freeTrialAvailable === "true";
     }
 
-    const products = await Product.find(query)
-    .sort(req.query.sort || "-createdAt");
+    const products = await Product.find(query).sort(
+      req.query.sort || "-createdAt"
+    );
 
     res.json(products);
   } catch (error) {
@@ -125,7 +126,9 @@ exports.createProduct = async (req, res) => {
         categories = JSON.parse(categories);
         // Ensure categories is an array of strings
         if (Array.isArray(categories)) {
-          categories = categories.map(cat => typeof cat === 'string' ? cat : cat.name || '');
+          categories = categories.map((cat) =>
+            typeof cat === "string" ? cat : cat.name || ""
+          );
         }
       } catch (e) {
         categories = [];
@@ -224,9 +227,20 @@ exports.deleteProduct = async (req, res) => {
 // Get all unique categories
 exports.getCategories = async (req, res) => {
   try {
-    const products = await Product.find({}, 'categories');
-    const uniqueCategories = [...new Set(products.flatMap(product => product.categories))];
-    res.json(uniqueCategories);
+    const products = await Product.find({}, "categories");
+    console.log(products);
+    const uniqueCategories = [
+      ...new Set(products.flatMap((product) => product.categories)),
+    ];
+    const uniqueCategoriesWithCount = uniqueCategories.map((category) => {
+      return {
+        category,
+        count: products.filter((product) =>
+          product.categories.includes(category)
+        ).length,
+      };
+    });
+    res.json(uniqueCategoriesWithCount);
   } catch (error) {
     console.error("Error getting categories:", error);
     res.status(500).json({ message: "Server error" });

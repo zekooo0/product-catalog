@@ -38,9 +38,6 @@ export default function Page() {
       />
       <div className="flex w-full">
         <Sidebar
-          // categories={categories || []}
-          // categoriesLoading={categoriesLoading}
-          // categoriesError={categoriesError}
           selectedCategory={selectedCategory}
           onCategorySelect={setSelectedCategory}
         />

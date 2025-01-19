@@ -12,7 +12,7 @@ const Sidebar = ({
     data: categories,
     error: categoriesError,
     isLoading: categoriesLoading,
-  } = useSWR<string[]>(
+  } = useSWR<{ category: string; count: number }[]>(
     "http://localhost:5000/api/products/categories",
     fetcher
   );
@@ -42,15 +42,20 @@ const Sidebar = ({
         {categories?.map((category, index) => (
           <li
             key={index}
-            onClick={() => onCategorySelect(category)}
+            onClick={() => onCategorySelect(category.category)}
             className={cn(
-              "cursor-pointer py-2 px-3 rounded-md transition-colors",
-              selectedCategory === category
+              "cursor-pointer py-2 px-3 rounded-md transition-colors flex justify-between",
+              selectedCategory === category.category
                 ? "bg-blue-500 text-white"
                 : "hover:bg-gray-100"
             )}
           >
-            {category}
+            <span>
+              {category.category} ({category.count})
+            </span>
+            {selectedCategory === category.category && (
+              <span className="text-blue-500">✓</span>
+            )}
           </li>
         ))}
       </ul>
