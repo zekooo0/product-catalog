@@ -87,16 +87,34 @@ const EditProductCard = ({
 
   const handleAddKeyword = () => {
     if (keywordInput.trim()) {
-      const currentKeywords = form.getValues("keywords");
-      form.setValue("keywords", [...currentKeywords, keywordInput.trim()]);
+      const newKeywords = keywordInput.includes(",")
+        ? keywordInput
+            .split(",")
+            .map((k) => k.trim())
+            .filter((k) => k.length > 0)
+        : [keywordInput.trim()];
+
+      form.setValue("keywords", [
+        ...form.getValues("keywords"),
+        ...newKeywords,
+      ]);
       setKeywordInput("");
     }
   };
 
   const handleAddCategory = () => {
     if (categoryInput.trim()) {
-      const currentCategories = form.getValues("categories");
-      form.setValue("categories", [...currentCategories, categoryInput.trim()]);
+      const newCategories = categoryInput.includes(",")
+        ? categoryInput
+            .split(",")
+            .map((c) => c.trim())
+            .filter((c) => c.length > 0)
+        : [categoryInput.trim()];
+
+      form.setValue("categories", [
+        ...form.getValues("categories"),
+        ...newCategories,
+      ]);
       setCategoryInput("");
     }
   };
@@ -172,6 +190,16 @@ const EditProductCard = ({
     }
   }, [open, product, form]);
 
+  // Extract domain name from URL
+  const extractDomainName = (url: string) => {
+    try {
+      const hostname = new URL(url).hostname;
+      return hostname.replace(/^www\./, '');
+    } catch {
+      return '';
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -226,8 +254,39 @@ const EditProductCard = ({
                 <FormItem>
                   <FormLabel>URL</FormLabel>
                   <FormControl>
-                    <Input placeholder="https://example.com" {...field} />
+                    <Input
+                      placeholder="https://example.com"
+                      {...field}
+                      onChange={(e) => {
+                        field.onChange(e);
+                        // Auto-fill domain name when URL changes
+                        const domainName = extractDomainName(e.target.value);
+                        if (domainName) {
+                          form.setValue("domainName", domainName);
+                        }
+                      }}
+                    />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="domainName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Domain Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="example.com"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    This will be auto-filled from the URL but can be edited if needed.
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -346,22 +405,27 @@ const EditProductCard = ({
                 <FormItem>
                   <FormLabel>Keywords</FormLabel>
                   <FormControl>
-                    <div className="flex gap-2">
-                      <Input
-                        placeholder="Keywords"
-                        className="flex-1"
-                        value={keywordInput}
-                        onChange={(e) => setKeywordInput(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            e.preventDefault();
-                            handleAddKeyword();
-                          }
-                        }}
-                      />
-                      <Button type="button" onClick={handleAddKeyword}>
-                        Add
-                      </Button>
+                    <div className="space-y-2">
+                      <div className="flex gap-2">
+                        <Input
+                          placeholder="Add single keyword or comma-separated list"
+                          value={keywordInput}
+                          onChange={(e) => setKeywordInput(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              handleAddKeyword();
+                            }
+                          }}
+                        />
+                        <Button type="button" onClick={handleAddKeyword}>
+                          Add
+                        </Button>
+                      </div>
+                      <FormDescription>
+                        Press Enter to add. You can add one keyword at a time or
+                        multiple keywords separated by commas.
+                      </FormDescription>
                     </div>
                   </FormControl>
                   <div className="flex gap-2 mt-2 flex-wrap">
@@ -387,22 +451,27 @@ const EditProductCard = ({
                 <FormItem>
                   <FormLabel>Categories</FormLabel>
                   <FormControl>
-                    <div className="flex gap-2">
-                      <Input
-                        placeholder="Categories"
-                        className="flex-1"
-                        value={categoryInput}
-                        onChange={(e) => setCategoryInput(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            e.preventDefault();
-                            handleAddCategory();
-                          }
-                        }}
-                      />
-                      <Button type="button" onClick={handleAddCategory}>
-                        Add
-                      </Button>
+                    <div className="space-y-2">
+                      <div className="flex gap-2">
+                        <Input
+                          placeholder="Add single category or comma-separated list"
+                          value={categoryInput}
+                          onChange={(e) => setCategoryInput(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              handleAddCategory();
+                            }
+                          }}
+                        />
+                        <Button type="button" onClick={handleAddCategory}>
+                          Add
+                        </Button>
+                      </div>
+                      <FormDescription>
+                        Press Enter to add. You can add one category at a time
+                        or multiple categories separated by commas.
+                      </FormDescription>
                     </div>
                   </FormControl>
                   <div className="flex gap-2 mt-2 flex-wrap">

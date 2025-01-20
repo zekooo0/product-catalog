@@ -63,11 +63,7 @@ exports.getProducts = async (req, res) => {
 
     // Search functionality
     if (req.query.search) {
-      query.$or = [
-        { domainName: { $regex: req.query.search, $options: 'i' } },
-        { description: { $regex: req.query.search, $options: 'i' } },
-        { categories: { $regex: req.query.search, $options: 'i' } }
-      ];
+      query.$or = [{ keywords: { $regex: req.query.search, $options: "i" } }];
     }
 
     // Rating filter

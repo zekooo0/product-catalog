@@ -72,7 +72,6 @@ const ProductHeader = ({
       <h2 className="scroll-m-20 text-xl font-bold tracking-tight">
         {domainName}
       </h2>
-      my-5
     </a>
     <div className="flex items-center gap-1">
       <span className="font-bold text-lg">{rating}</span>
