@@ -80,19 +80,16 @@ const ProductHeader = ({
   </div>
 );
 
-const ProductCategories = ({ categories }: { categories: string[] }) => {
-  const MAX_VISIBLE_CATEGORIES = 3;
-  const visibleCategories = categories.slice(0, MAX_VISIBLE_CATEGORIES);
-  const remainingCount = categories.length - MAX_VISIBLE_CATEGORIES;
+const ProductKeywords = ({ keywords }: { keywords: string[] }) => {
+  const MAX_VISIBLE_KEYWORDS = 3;
+  const visibleKeywords = keywords.slice(0, MAX_VISIBLE_KEYWORDS);
+  const remainingCount = keywords.length - MAX_VISIBLE_KEYWORDS;
 
   return (
     <div className="flex flex-wrap gap-2 px-4">
-      {visibleCategories.map((category, index) => (
-        <Badge
-          key={`visible-category-${category}-${index}`}
-          variant="secondary"
-        >
-          {category}
+      {visibleKeywords.map((keyword, index) => (
+        <Badge key={`visible-keyword-${keyword}-${index}`} variant="secondary">
+          {keyword}
         </Badge>
       ))}
       {remainingCount > 0 && (
@@ -104,16 +101,14 @@ const ProductCategories = ({ categories }: { categories: string[] }) => {
               </Badge>
             </TooltipTrigger>
             <TooltipContent className="flex flex-wrap gap-2 max-w-xs">
-              {categories
-                .slice(MAX_VISIBLE_CATEGORIES)
-                .map((category, index) => (
-                  <Badge
-                    key={`tooltip-category-${category}-${index}`}
-                    variant="secondary"
-                  >
-                    {category}
-                  </Badge>
-                ))}
+              {keywords.slice(MAX_VISIBLE_KEYWORDS).map((keyword, index) => (
+                <Badge
+                  key={`tooltip-keyword-${keyword}-${index}`}
+                  variant="secondary"
+                >
+                  {keyword}
+                </Badge>
+              ))}
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -240,7 +235,7 @@ const ProductCard = ({ product, mutateProducts }: ProductCardProps) => {
           </Tooltip>
         </TooltipProvider>
 
-        <ProductCategories categories={product.categories} />
+        <ProductKeywords keywords={product.keywords} />
       </div>
 
       <div className="bg-muted p-4 flex justify-between items-center">

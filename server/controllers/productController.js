@@ -63,7 +63,8 @@ exports.getProducts = async (req, res) => {
 
     // Search functionality
     if (req.query.search) {
-      query.$or = [{ keywords: { $regex: req.query.search, $options: "i" } }];
+      const searchRegex = new RegExp(req.query.search.trim(), "i");
+      query.keywords = { $in: [searchRegex] };
     }
 
     // Rating filter
@@ -171,27 +172,31 @@ exports.createProduct = async (req, res) => {
 exports.updateProduct = async (req, res) => {
   try {
     let updateData = {};
-    
+
     // Handle FormData fields
-    if (req.file || req.is('multipart/form-data')) {
+    if (req.file || req.is("multipart/form-data")) {
       // If there's a file, upload it to Cloudinary
       if (req.file) {
         updateData.imageURL = await uploadToCloudinary(req.file);
       }
-      
+
       // Handle other FormData fields
       if (req.body.url) updateData.url = req.body.url;
       if (req.body.domainName) updateData.domainName = req.body.domainName;
       if (req.body.description) updateData.description = req.body.description;
       if (req.body.rating) updateData.rating = parseFloat(req.body.rating);
-      if (req.body.freeTrialAvailable) updateData.freeTrialAvailable = req.body.freeTrialAvailable === 'true';
-      if (req.body.reviewers) updateData.reviewers = JSON.parse(req.body.reviewers);
-      if (req.body.keywords) updateData.keywords = JSON.parse(req.body.keywords);
-      if (req.body.categories) updateData.categories = JSON.parse(req.body.categories);
+      if (req.body.freeTrialAvailable)
+        updateData.freeTrialAvailable = req.body.freeTrialAvailable === "true";
+      if (req.body.reviewers)
+        updateData.reviewers = JSON.parse(req.body.reviewers);
+      if (req.body.keywords)
+        updateData.keywords = JSON.parse(req.body.keywords);
+      if (req.body.categories)
+        updateData.categories = JSON.parse(req.body.categories);
     } else {
       // Handle JSON data
       updateData = { ...req.body };
-      
+
       // Validate imageURL if it's being updated
       if (updateData.imageURL && !isValidUrl(updateData.imageURL)) {
         return res.status(400).json({
