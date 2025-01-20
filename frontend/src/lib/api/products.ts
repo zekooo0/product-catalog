@@ -66,15 +66,21 @@ export const productsApi = {
   async updateProduct(
     token: string,
     id: string,
-    product: Partial<Omit<Product, "_id" | "createdAt" | "updatedAt">>
+    product: Partial<Omit<Product, "_id" | "createdAt" | "updatedAt">> | FormData
   ): Promise<Product> {
+    const headers: HeadersInit = {
+      Authorization: `Bearer ${token}`,
+    };
+
+    // Only set Content-Type for JSON data, let browser set it for FormData
+    if (!(product instanceof FormData)) {
+      headers["Content-Type"] = "application/json";
+    }
+
     const response = await fetch(`${API_BASE_URL}/products/${id}`, {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(product),
+      headers,
+      body: product instanceof FormData ? product : JSON.stringify(product),
     });
 
     if (!response.ok) {

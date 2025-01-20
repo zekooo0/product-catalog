@@ -36,7 +36,7 @@ const Products = ({
     <div className="flex-1">
       <div className="flex justify-between items-center px-5">
         <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight my-5">
-          All Products
+          Tool
         </h3>
         {isAuthenticated && <AddProductCard mutateProducts={mutateProducts} />}
       </div>

@@ -12,7 +12,7 @@ const Search = () => {
       <SearchIcon className="text-muted-foreground" />
       <Input
         type="search"
-        placeholder="Search for tools and services..."
+        placeholder="Search by keywords..."
         className="flex-1 border-none focus-visible:ring-0 focus-visible:ring-offset-0"
         aria-label="Search products"
         value={search}

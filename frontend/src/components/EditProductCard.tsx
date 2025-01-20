@@ -69,6 +69,7 @@ const EditProductCard = ({
     url: "",
   });
   const [open, setOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
@@ -157,21 +158,30 @@ const EditProductCard = ({
 
   const onSubmit = async (data: ProductFormValues) => {
     const token = window.localStorage.getItem("authToken") ?? "";
-    const transformedData = {
-      ...data,
-      domainName: data.url.split("/")[2],
-      imageURL: data.imageUrl,
-      freeTrialAvailable: data.freeTrial,
-      categories: data.categories,
-    };
-    await productsApi.updateProduct(
-      token,
-      product._id as string,
-      transformedData
-    );
-    form.reset();
-    mutateProducts();
-    setOpen(false);
+
+    try {
+      setIsSubmitting(true);
+
+      const formData = new FormData();
+      formData.append("url", data.url);
+      // Ensure domain name is properly formatted without www.
+      formData.append("domainName", data.domainName.replace(/^www\./, ""));
+      formData.append("description", data.description);
+      formData.append("rating", data.rating.toString());
+      formData.append("freeTrialAvailable", data.freeTrial.toString());
+      formData.append("reviewers", JSON.stringify(data.reviewers));
+      formData.append("keywords", JSON.stringify(data.keywords));
+      formData.append("categories", JSON.stringify(data.categories));
+
+      await productsApi.updateProduct(token, product._id as string, formData);
+      form.reset();
+      mutateProducts();
+      setOpen(false);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   useEffect(() => {
@@ -194,9 +204,9 @@ const EditProductCard = ({
   const extractDomainName = (url: string) => {
     try {
       const hostname = new URL(url).hostname;
-      return hostname.replace(/^www\./, '');
+      return hostname.replace(/^www\./, "");
     } catch {
-      return '';
+      return "";
     }
   };
 
@@ -279,13 +289,11 @@ const EditProductCard = ({
                 <FormItem>
                   <FormLabel>Domain Name</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="example.com"
-                      {...field}
-                    />
+                    <Input placeholder="example.com" {...field} />
                   </FormControl>
                   <FormDescription>
-                    This will be auto-filled from the URL but can be edited if needed.
+                    This will be auto-filled from the URL but can be edited if
+                    needed.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -491,7 +499,9 @@ const EditProductCard = ({
             />
             <DialogFooter>
               <Button variant="outline">Cancel</Button>
-              <Button type="submit">Save Product</Button>
+              <Button type="submit" disabled={isSubmitting}>
+                Save Product
+              </Button>
             </DialogFooter>
           </form>
         </Form>

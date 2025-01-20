@@ -154,52 +154,48 @@ const AddProductCard = ({ mutateProducts }: { mutateProducts: () => void }) => {
   const onSubmit = async (data: ProductFormValues) => {
     const token = window.localStorage.getItem("authToken") ?? "";
 
-    // Create FormData if we have a file
-    if (selectedFile) {
-      const formData = new FormData();
+    try {
+      // Create FormData if we have a file
+      if (selectedFile) {
+        const formData = new FormData();
 
-      // Add basic string fields
-      formData.append("url", data.url);
-      formData.append("description", data.description);
-      formData.append("rating", data.rating.toString());
-      formData.append("freeTrial", data.freeTrial.toString());
-      formData.append("domainName", data.url.split("/")[2]);
+        // Add basic string fields
+        formData.append("url", data.url);
+        // Ensure domain name is properly formatted without www.
+        formData.append("domainName", data.domainName.replace(/^www\./, ""));
+        formData.append("description", data.description);
+        formData.append("rating", data.rating.toString());
+        formData.append("freeTrial", data.freeTrial.toString());
+        formData.append("reviewers", JSON.stringify(data.reviewers));
+        formData.append("keywords", JSON.stringify(data.keywords));
+        formData.append("categories", JSON.stringify(data.categories));
 
-      // Add arrays as JSON strings
-      formData.append(
-        "categories",
-        JSON.stringify(
-          data.categories.map((categoryName) => ({
-            name: categoryName,
-          }))
-        )
-      );
-      formData.append("reviewers", JSON.stringify(data.reviewers));
-      formData.append("keywords", JSON.stringify(data.keywords));
+        // Add the file last
+        formData.append("image", selectedFile);
 
-      // Add the file last
-      formData.append("image", selectedFile);
-
-      await productsApi.createProduct(token, formData);
-    } else {
-      // If no file, send as regular JSON
-      const transformedData = {
-        imageURL: selectedFile ? "" : data.imageUrl || "",
-        domainName: data.url.split("/")[2],
-        url: data.url,
-        description: data.description,
-        rating: data.rating,
-        freeTrialAvailable: data.freeTrial,
-        categories: data.categories,
-        reviewers: data.reviewers,
-        keywords: data.keywords,
-      };
-      await productsApi.createProduct(token, transformedData);
+        await productsApi.createProduct(token, formData);
+      } else {
+        // If no file, send as regular JSON
+        const transformedData = {
+          imageURL: selectedFile ? "" : data.imageUrl || "",
+          domainName: data.domainName.replace(/^www\./, ""),
+          url: data.url,
+          description: data.description,
+          rating: data.rating,
+          freeTrialAvailable: data.freeTrial,
+          categories: data.categories,
+          reviewers: data.reviewers,
+          keywords: data.keywords,
+        };
+        await productsApi.createProduct(token, transformedData);
+      }
+      form.reset();
+      setSelectedFile(null);
+      setImagePreview(null);
+      mutateProducts();
+    } catch (error) {
+      console.error(error);
     }
-    form.reset();
-    setSelectedFile(null);
-    setImagePreview(null);
-    mutateProducts();
   };
 
   const onClose = () => {
@@ -212,9 +208,9 @@ const AddProductCard = ({ mutateProducts }: { mutateProducts: () => void }) => {
   const extractDomainName = (url: string) => {
     try {
       const hostname = new URL(url).hostname;
-      return hostname.replace(/^www\./, '');
+      return hostname.replace(/^www\./, "");
     } catch {
-      return '';
+      return "";
     }
   };
 
@@ -339,15 +335,13 @@ const AddProductCard = ({ mutateProducts }: { mutateProducts: () => void }) => {
               name="domainName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Domain Name</FormLabel>
+                  <FormLabel>Domain Name - Tool</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="example.com"
-                      {...field}
-                    />
+                    <Input placeholder="example.com" {...field} />
                   </FormControl>
                   <FormDescription>
-                    This will be auto-filled from the URL but can be edited if needed.
+                    This will be auto-filled from the URL but can be edited if
+                    needed.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

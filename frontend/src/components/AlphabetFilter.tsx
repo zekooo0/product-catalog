@@ -17,9 +17,8 @@ export default function AlphabetFilter({
         className="btn"
         variant={selectedLetter === "" ? "outline" : "default"}
         onClick={() => setSelectedLetter("")}
-        // disabled={selectedLetter === ""}
       >
-        All
+        All Tools
       </Button>
 
       {letters.map((letter) => (

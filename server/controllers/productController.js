@@ -170,14 +170,34 @@ exports.createProduct = async (req, res) => {
 // Update product
 exports.updateProduct = async (req, res) => {
   try {
-    let updateData = { ...req.body };
-    // Handle file upload if present
-    if (req.file) {
-      updateData.imageURL = await uploadToCloudinary(req.file);
-    } else if (req.body.imageURL && !isValidUrl(req.body.imageURL)) {
-      return res.status(400).json({
-        message: "Please provide a valid image URL or upload an image file",
-      });
+    let updateData = {};
+    
+    // Handle FormData fields
+    if (req.file || req.is('multipart/form-data')) {
+      // If there's a file, upload it to Cloudinary
+      if (req.file) {
+        updateData.imageURL = await uploadToCloudinary(req.file);
+      }
+      
+      // Handle other FormData fields
+      if (req.body.url) updateData.url = req.body.url;
+      if (req.body.domainName) updateData.domainName = req.body.domainName;
+      if (req.body.description) updateData.description = req.body.description;
+      if (req.body.rating) updateData.rating = parseFloat(req.body.rating);
+      if (req.body.freeTrialAvailable) updateData.freeTrialAvailable = req.body.freeTrialAvailable === 'true';
+      if (req.body.reviewers) updateData.reviewers = JSON.parse(req.body.reviewers);
+      if (req.body.keywords) updateData.keywords = JSON.parse(req.body.keywords);
+      if (req.body.categories) updateData.categories = JSON.parse(req.body.categories);
+    } else {
+      // Handle JSON data
+      updateData = { ...req.body };
+      
+      // Validate imageURL if it's being updated
+      if (updateData.imageURL && !isValidUrl(updateData.imageURL)) {
+        return res.status(400).json({
+          message: "Please provide a valid image URL or upload an image file",
+        });
+      }
     }
 
     const product = await Product.findByIdAndUpdate(req.params.id, updateData, {
