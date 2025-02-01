@@ -3,53 +3,33 @@
 import Header from "@/components/Header";
 import Products from "@/components/Products";
 import Sidebar from "@/components/Sidebar";
-import { API_BASE_URL } from "@/lib/config";
-import { Product } from "@/lib/types";
-import { fetcher } from "@/lib/utils";
-import { useSearchParams } from "next/navigation";
-import { useState } from "react";
-import useSWR from "swr";
+import { useProducts } from "@/hooks/useProducts";
 
 export default function ProductsPage() {
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedLetter, setSelectedLetter] = useState<string>("");
-
-  const searchParams = useSearchParams();
-  const search = searchParams.get("search");
-
-  // Construct the API URL with filters
-  const apiUrl = `${API_BASE_URL}/products${
-    selectedCategory || selectedLetter || search
-      ? "?" +
-        new URLSearchParams({
-          ...(selectedCategory && { category: selectedCategory }),
-          ...(selectedLetter && { letter: selectedLetter }),
-          ...(search && { search }),
-        }).toString()
-      : ""
-  }`;
-
   const {
-    data: products,
+    products,
     error: productsError,
     isLoading: productsLoading,
     mutate: mutateProducts,
-  } = useSWR<Product[]>(apiUrl, fetcher);
+    filters,
+    setSelectedCategory,
+    setSelectedLetter,
+  } = useProducts();
 
   return (
     <div className="relative">
       <Header
-        selectedLetter={selectedLetter}
+        selectedLetter={filters.selectedLetter}
         setSelectedLetter={setSelectedLetter}
       />
       <div className="flex w-full">
         <Sidebar
-          selectedCategory={selectedCategory}
+          selectedCategory={filters.selectedCategory}
           onCategorySelect={setSelectedCategory}
         />
         <div className="flex-1">
           <Products
-            products={products || []}
+            products={products}
             productsLoading={productsLoading}
             productsError={productsError}
             mutateProducts={mutateProducts}
