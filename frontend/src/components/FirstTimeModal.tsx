@@ -65,7 +65,7 @@ const FirstTimeModal = () => {
             <div className="flex flex-col gap-1">
               <h4 className="font-semibold">Categories</h4>
               <p className="text-sm text-muted-foreground">
-                Explore tools by category type
+              Explore tools by category type. Click Clear to start a new search
               </p>
             </div>
           </div>
