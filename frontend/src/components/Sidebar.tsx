@@ -2,6 +2,7 @@ import { cn, fetcher } from "@/lib/utils";
 import useSWR from "swr";
 import LoadingSpinner from "./LoadingSpinner";
 import { API_BASE_URL } from "@/lib/config";
+import { Button } from "./ui/button";
 
 const Sidebar = ({
   selectedCategory,
@@ -36,12 +37,12 @@ const Sidebar = ({
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">Categories</h2>
         {selectedCategory && (
-          <button
+          <Button
             onClick={() => onCategorySelect(null)}
-            className="text-sm text-blue-500 hover:text-blue-700"
+            className="text-md cursor-pointer bg-gray-500 dark:bg-white px-2 py-1 rounded-md transition-colors text-blue-700 hover:text-blue-800 hover:bg-gray-100"
           >
             Clear
-          </button>
+          </Button>
         )}
       </div>
       <ul className="space-y-2">

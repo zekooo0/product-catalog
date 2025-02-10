@@ -37,7 +37,7 @@ const Header = ({
         </div>
       </div>
       <div className=" flex flex-col items-center justify-between  gap-5">
-        <Search />
+        <Search setSelectedLetter={setSelectedLetter} />
         <AlphabetFilter
           setSelectedLetter={setSelectedLetter}
           selectedLetter={selectedLetter}

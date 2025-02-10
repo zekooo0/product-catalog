@@ -1,9 +1,12 @@
 import { SearchIcon } from "lucide-react";
 import { Input } from "./ui/input";
-
 import { useQueryState } from "nuqs";
 
-const Search = () => {
+interface SearchProps {
+  setSelectedLetter: (letter: string) => void;
+}
+
+const Search = ({ setSelectedLetter }: SearchProps) => {
   const [search, setSearch] = useQueryState("search", {
     defaultValue: "",
   });
@@ -16,7 +19,10 @@ const Search = () => {
         className="flex-1 border-none focus-visible:ring-0 focus-visible:ring-offset-0"
         aria-label="Search products"
         value={search}
-        onChange={(e) => setSearch(e.target.value)}
+        onChange={(e) => {
+          setSearch(e.target.value);
+          setSelectedLetter(""); // Clear the selected letter when typing
+        }}
       />
     </div>
   );

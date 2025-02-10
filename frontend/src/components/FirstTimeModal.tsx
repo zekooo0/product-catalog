@@ -14,7 +14,7 @@ const FirstTimeModal = () => {
     const hasVisited = localStorage.getItem('hasVisitedBefore');
     if (!hasVisited) {
       setIsOpen(true);
-      localStorage.setItem('hasVisitedBefore', 'true');
+      // localStorage.setItem('hasVisitedBefore', 'true');
     }
   }, []);
 
@@ -53,7 +53,7 @@ const FirstTimeModal = () => {
             <div className="flex flex-col gap-1">
               <h4 className="font-semibold">A-Z Navigation</h4>
               <p className="text-sm text-muted-foreground">
-                Browse alphabetically for easy access
+                Browse alphabetically for easy access by Tool
               </p>
             </div>
           </div>
