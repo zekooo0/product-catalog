@@ -17,17 +17,17 @@ export default function ProductsPage() {
   } = useProducts();
 
   return (
-    <div className="relative">
+    <div className="relative h-screen flex flex-col overflow-hidden">
       <Header
         selectedLetter={filters.selectedLetter}
         setSelectedLetter={setSelectedLetter}
       />
-      <div className="flex w-full">
+      <div className="flex w-full flex-1 overflow-hidden">
         <Sidebar
           selectedCategory={filters.selectedCategory}
           onCategorySelect={setSelectedCategory}
         />
-        <div className="flex-1">
+        <div className="flex-1 overflow-y-auto">
           <Products
             products={products}
             productsLoading={productsLoading}

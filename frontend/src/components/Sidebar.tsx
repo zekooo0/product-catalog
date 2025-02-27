@@ -33,7 +33,7 @@ const Sidebar = ({
   }
 
   return (
-    <div className="p-5 min-w-[200px] border-r">
+    <div className="sticky top-0 left-0 max-h-[70vh] p-5 min-w-[200px] border-r flex flex-col overflow-hidden">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">Categories</h2>
         {selectedCategory && (
@@ -45,7 +45,7 @@ const Sidebar = ({
           </Button>
         )}
       </div>
-      <ul className="space-y-2">
+      <ul className="space-y-2 overflow-y-auto flex-grow">
         {categories?.map((category, index) => (
           <li
             key={index}
