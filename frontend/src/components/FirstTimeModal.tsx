@@ -1,7 +1,13 @@
-'use client';
+"use client";
 
-import { useLayoutEffect, useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { useLayoutEffect, useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Search, ListOrdered, LayoutGrid } from "lucide-react";
 
@@ -11,7 +17,7 @@ const FirstTimeModal = () => {
 
   useLayoutEffect(() => {
     setMounted(true);
-    const hasVisited = localStorage.getItem('hasVisitedBefore');
+    const hasVisited = localStorage.getItem("hasVisitedBefore");
     if (!hasVisited) {
       setIsOpen(true);
       // localStorage.setItem('hasVisitedBefore', 'true');
@@ -23,20 +29,23 @@ const FirstTimeModal = () => {
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => {
-      setIsOpen(open);
-      if (!open) {
-        localStorage.setItem('hasVisitedBefore', 'true');
-      }
-    }}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        setIsOpen(open);
+        if (!open) {
+          localStorage.setItem("hasVisitedBefore", "true");
+        }
+      }}
+    >
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-center">How to use this app</DialogTitle>
         </DialogHeader>
         <div className="flex flex-col space-y-6 py-4">
           <div className="flex items-center gap-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-pink-100">
-              <Search className="h-6 w-6 text-pink-500" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
+              <Search className="h-6 w-6 text-blue-500" />
             </div>
             <div className="flex flex-col gap-1">
               <h4 className="font-semibold">Quick Search</h4>
@@ -47,8 +56,8 @@ const FirstTimeModal = () => {
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-pink-100">
-              <ListOrdered className="h-6 w-6 text-pink-500" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
+              <ListOrdered className="h-6 w-6 text-blue-500" />
             </div>
             <div className="flex flex-col gap-1">
               <h4 className="font-semibold">A-Z Navigation</h4>
@@ -59,13 +68,14 @@ const FirstTimeModal = () => {
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-pink-100">
-              <LayoutGrid className="h-6 w-6 text-pink-500" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
+              <LayoutGrid className="h-6 w-6 text-blue-500" />
             </div>
             <div className="flex flex-col gap-1">
               <h4 className="font-semibold">Categories</h4>
               <p className="text-sm text-muted-foreground">
-              Explore tools by category type. Click Clear to start a new search
+                Explore tools by category type. Click Clear to start a new
+                search
               </p>
             </div>
           </div>
@@ -74,7 +84,7 @@ const FirstTimeModal = () => {
           <Button
             variant="default"
             onClick={() => setIsOpen(false)}
-            className="bg-pink-500 hover:bg-pink-600"
+            className="bg-blue-500 hover:bg-blue-600"
           >
             Got it!
           </Button>

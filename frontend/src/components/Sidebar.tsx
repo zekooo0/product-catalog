@@ -56,15 +56,13 @@ const Sidebar = ({
                 "cursor-pointer py-2 px-3 rounded-md transition-colors flex justify-between",
                 selectedCategory === category.category
                   ? "bg-blue-500 text-white"
-                  : "hover:bg-gray-100"
+                  : "hover:bg-gray-100 hover:text-blue-500"
               )}
             >
               <span>
                 {category.category} ({category.count})
               </span>
-              {selectedCategory === category.category && (
-                <span className="text-blue-500">✓</span>
-              )}
+              {selectedCategory === category.category && <span>✓</span>}
             </li>
           ))}
       </ul>

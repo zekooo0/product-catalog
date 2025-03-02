@@ -32,6 +32,13 @@ const Products = ({
   if (productsError) {
     return <div className="p-5 text-red-500">Error loading data</div>;
   }
+  if (products.length == 0) {
+    return (
+      <div className="flex items-center justify-center min-h-[70vh]">
+        No products found
+      </div>
+    );
+  }
   return (
     <div className="flex-1">
       <div className="flex justify-between items-center px-5">
