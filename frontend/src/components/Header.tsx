@@ -10,9 +10,11 @@ import { useAuth } from "@/contexts/auth-context";
 const Header = ({
   selectedLetter,
   setSelectedLetter,
+  selectedCategory,
 }: {
   selectedLetter: string;
   setSelectedLetter: (letter: string) => void;
+  selectedCategory: string | null;
 }) => {
   const { isAuthenticated, logout, user } = useAuth();
 
@@ -37,7 +39,11 @@ const Header = ({
         </div>
       </div>
       <div className=" flex flex-col items-center justify-between  gap-5">
-        <Search setSelectedLetter={setSelectedLetter} />
+        <Search 
+          setSelectedLetter={setSelectedLetter} 
+          selectedLetter={selectedLetter}
+          selectedCategory={selectedCategory}
+        />
         <AlphabetFilter
           setSelectedLetter={setSelectedLetter}
           selectedLetter={selectedLetter}

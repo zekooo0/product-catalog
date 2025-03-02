@@ -292,8 +292,8 @@ const starIcon = (
           y2="1.72"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#ff6f47" />
-          <stop offset="1" stop-color="#ffcd0f" />
+          <stop stopColor="#ff6f47" />
+          <stop offset="1" stopColor="#ffcd0f" />
         </linearGradient>
       </defs>
     </g>

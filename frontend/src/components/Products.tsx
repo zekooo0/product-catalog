@@ -48,7 +48,7 @@ const Products = ({
         </h3>
         {isAuthenticated && <AddProductCard mutateProducts={mutateProducts} />}
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 px-5">
         {products
           ?.sort((a, b) => b.rating - a.rating)
           ?.map((product) => (

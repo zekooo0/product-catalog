@@ -21,6 +21,7 @@ export default function ProductsPage() {
       <Header
         selectedLetter={filters.selectedLetter}
         setSelectedLetter={setSelectedLetter}
+        selectedCategory={filters.selectedCategory}
       />
       <div className="flex w-full flex-1 overflow-hidden">
         <Sidebar
