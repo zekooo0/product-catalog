@@ -39,6 +39,7 @@ const Products = ({
       </div>
     );
   }
+
   return (
     <div className="flex-1">
       <div className="flex justify-between items-center px-5">
@@ -48,13 +49,15 @@ const Products = ({
         {isAuthenticated && <AddProductCard mutateProducts={mutateProducts} />}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-5">
-        {products?.map((product) => (
-          <ProductCard
-            key={product._id}
-            product={product}
-            mutateProducts={mutateProducts}
-          />
-        ))}
+        {products
+          ?.sort((a, b) => b.rating - a.rating)
+          ?.map((product) => (
+            <ProductCard
+              key={product._id}
+              product={product}
+              mutateProducts={mutateProducts}
+            />
+          ))}
       </div>
     </div>
   );
