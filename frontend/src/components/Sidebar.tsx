@@ -46,25 +46,27 @@ const Sidebar = ({
         )}
       </div>
       <ul className="space-y-2 overflow-y-auto flex-grow">
-        {categories?.map((category, index) => (
-          <li
-            key={index}
-            onClick={() => onCategorySelect(category.category)}
-            className={cn(
-              "cursor-pointer py-2 px-3 rounded-md transition-colors flex justify-between",
-              selectedCategory === category.category
-                ? "bg-blue-500 text-white"
-                : "hover:bg-gray-100"
-            )}
-          >
-            <span>
-              {category.category} ({category.count})
-            </span>
-            {selectedCategory === category.category && (
-              <span className="text-blue-500">✓</span>
-            )}
-          </li>
-        ))}
+        {categories
+          ?.sort((a, b) => a.category.localeCompare(b.category))
+          ?.map((category, index) => (
+            <li
+              key={index}
+              onClick={() => onCategorySelect(category.category)}
+              className={cn(
+                "cursor-pointer py-2 px-3 rounded-md transition-colors flex justify-between",
+                selectedCategory === category.category
+                  ? "bg-blue-500 text-white"
+                  : "hover:bg-gray-100"
+              )}
+            >
+              <span>
+                {category.category} ({category.count})
+              </span>
+              {selectedCategory === category.category && (
+                <span className="text-blue-500">✓</span>
+              )}
+            </li>
+          ))}
       </ul>
     </div>
   );
