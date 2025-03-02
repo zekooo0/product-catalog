@@ -144,7 +144,6 @@ const AddProductCard = ({ mutateProducts }: { mutateProducts: () => void }) => {
 
   const handleRemoveReviewer = (index: number) => {
     const currentReviewers = form.getValues("reviewers");
-    console.log(currentReviewers, index);
     form.setValue(
       "reviewers",
       currentReviewers.filter((_, i) => i !== index)

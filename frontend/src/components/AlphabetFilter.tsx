@@ -10,7 +10,6 @@ export default function AlphabetFilter({
   setSelectedLetter: (letter: string) => void;
 }) {
   const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
-  console.log(selectedLetter);
   return (
     <div className="flex gap-1 overflow-x-scroll lg:overflow-x-hidden max-w-full  items-center">
       <Button
