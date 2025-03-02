@@ -48,7 +48,6 @@ const getCloudinaryPublicId = (url) => {
 exports.getProducts = async (req, res) => {
   try {
     let query = {};
-    console.log("Query");
     // Category filter
     if (req.query.category) {
       query.categories = { $in: [req.query.category] };
@@ -71,8 +70,6 @@ exports.getProducts = async (req, res) => {
         { description: searchRegex },
         { keywords: { $in: [searchRegex] } },
       ];
-
-      console.log("Search query:", JSON.stringify(query));
     }
 
     // Rating filter
@@ -84,7 +81,6 @@ exports.getProducts = async (req, res) => {
     if (req.query.freeTrialAvailable) {
       query.freeTrialAvailable = req.query.freeTrialAvailable === "true";
     }
-    console.log(query);
     const products = await Product.find(query).sort(
       req.query.sort || "-createdAt"
     );
