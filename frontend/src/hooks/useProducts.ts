@@ -32,18 +32,15 @@ export function useProducts(options: UseProductsOptions = {}) {
   // Create custom setter functions that reset other filters
   const setSelectedCategoryAndResetOthers = (category: string | null) => {
     setSelectedCategory(category);
-    // Only reset search if there's an actual category selected
     if (category) {
-      // We can't directly manipulate searchParams, but we'll handle this in the Search component
+      setSelectedLetter("");
     }
   };
 
   const setSelectedLetterAndResetOthers = (letter: string) => {
     setSelectedLetter(letter);
-    // Only reset other filters if there's an actual letter selected
     if (letter) {
       setSelectedCategory(null);
-      // We can't directly manipulate searchParams, but we'll handle this in the Search component
     }
   };
 
@@ -58,7 +55,7 @@ export function useProducts(options: UseProductsOptions = {}) {
   }
 
   const filters = new URLSearchParams(activeFilter).toString();
-  
+
   const apiUrl = `${API_BASE_URL}/products${filters ? `?${filters}` : ""}`;
 
   const {
