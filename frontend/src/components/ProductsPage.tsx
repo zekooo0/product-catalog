@@ -22,6 +22,7 @@ export default function ProductsPage() {
         selectedLetter={filters.selectedLetter}
         setSelectedLetter={setSelectedLetter}
         selectedCategory={filters.selectedCategory}
+        setSelectedCategory={setSelectedCategory}
       />
       <div className="flex w-full flex-1 overflow-hidden">
         <Sidebar

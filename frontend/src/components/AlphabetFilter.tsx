@@ -5,9 +5,11 @@ import { Button } from "./ui/button";
 export default function AlphabetFilter({
   selectedLetter,
   setSelectedLetter,
+  setSelectedCategory,
 }: {
   selectedLetter: string;
   setSelectedLetter: (letter: string) => void;
+  setSelectedCategory: (category: string | null) => void;
 }) {
   const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
   return (
@@ -15,7 +17,10 @@ export default function AlphabetFilter({
       <Button
         className="btn"
         variant={selectedLetter === "" ? "outline" : "default"}
-        onClick={() => setSelectedLetter("")}
+        onClick={() => {
+          setSelectedLetter("");
+          setSelectedCategory(null);
+        }}
       >
         All Tools
       </Button>

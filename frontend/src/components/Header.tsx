@@ -11,10 +11,12 @@ const Header = ({
   selectedLetter,
   setSelectedLetter,
   selectedCategory,
+  setSelectedCategory,
 }: {
   selectedLetter: string;
   setSelectedLetter: (letter: string) => void;
   selectedCategory: string | null;
+  setSelectedCategory: (category: string | null) => void;
 }) => {
   const { isAuthenticated, logout, user } = useAuth();
 
@@ -39,14 +41,15 @@ const Header = ({
         </div>
       </div>
       <div className=" flex flex-col items-center justify-between  gap-5">
-        <Search 
-          setSelectedLetter={setSelectedLetter} 
+        <Search
+          setSelectedLetter={setSelectedLetter}
           selectedLetter={selectedLetter}
           selectedCategory={selectedCategory}
         />
         <AlphabetFilter
           setSelectedLetter={setSelectedLetter}
           selectedLetter={selectedLetter}
+          setSelectedCategory={setSelectedCategory}
         />
       </div>
       <Separator />
