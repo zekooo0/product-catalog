@@ -212,7 +212,7 @@ const EditProductCard = ({
         throw new Error(`Server responded with ${response.status}`);
       }
 
-      const updatedProduct = await response.json();
+      await response.json();
 
       // Reset form and state
       form.reset();
