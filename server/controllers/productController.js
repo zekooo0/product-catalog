@@ -197,6 +197,19 @@ exports.updateProduct = async (req, res) => {
         updateData.keywords = JSON.parse(req.body.keywords);
       if (req.body.categories)
         updateData.categories = JSON.parse(req.body.categories);
+      
+      // Only update imageURL from form data if it's explicitly included
+      // This prevents overwriting with empty values when uploading files
+      if (req.body.imageURL !== undefined) {
+        // Only set if it's a non-empty string
+        if (req.body.imageURL) {
+          updateData.imageURL = req.body.imageURL;
+        } 
+        // If empty string and no file, explicitly set to null for database
+        else if (!req.file) {
+          updateData.imageURL = null;
+        }
+      }
     } else {
       // Handle JSON data
       updateData = { ...req.body };

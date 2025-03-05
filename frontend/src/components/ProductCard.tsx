@@ -45,13 +45,19 @@ const ProductImage = ({
 }) => (
   <div className="relative h-[200px] w-full border-b ">
     <a target="_blank" href={url}>
-      <Image
-        src={imageURL}
-        alt={domainName}
-        fill
-        className="object-cover bg-blend-multiply"
-        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-      />
+      {imageURL && imageURL.trim() !== "" ? (
+        <Image
+          src={imageURL}
+          alt={domainName}
+          fill
+          className="object-cover bg-blend-multiply"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        />
+      ) : (
+        <div className="w-full h-full flex items-center justify-center bg-gray-200">
+          <span className="text-gray-500">No image available</span>
+        </div>
+      )}
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
     </a>
     {freeTrail && <Badge className="absolute top-2 right-2">Free Trail</Badge>}

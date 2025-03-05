@@ -28,8 +28,9 @@ import {
 } from "./ui/form";
 import { Pencil, X } from "lucide-react";
 import { useState, useEffect } from "react";
-import { productsApi } from "@/lib/api";
+import { productsApi } from "@/lib/api/products";
 import { Product } from "@/lib/types";
+import { API_BASE_URL } from "@/lib/config";
 
 type Reviewer = {
   name: string;
@@ -37,7 +38,11 @@ type Reviewer = {
 };
 
 const productSchema = z.object({
-  imageUrl: z.string().url("Please enter a valid URL"),
+  imageUrl: z.union([
+    z.string().url("Please enter a valid URL"),
+    z.string().length(0) // Allow empty string
+  ]),
+  imageFile: z.any().optional(),
   domainName: z.string(),
   url: z.string().url("Please enter a valid URL"),
   description: z.string().min(10, "Description must be at least 10 characters"),
@@ -70,11 +75,16 @@ const EditProductCard = ({
   });
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageUrlCleared, setImageUrlCleared] = useState(false);
+  const [fileUploading, setFileUploading] = useState(false);
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
     defaultValues: {
       imageUrl: product.imageURL,
+      imageFile: null,
       domainName: product.domainName,
       url: product.url,
       description: product.description,
@@ -161,9 +171,11 @@ const EditProductCard = ({
     try {
       setIsSubmitting(true);
 
+      // Create a new FormData instance
       const formData = new FormData();
+
+      // Basic product data
       formData.append("url", data.url);
-      // Ensure domain name is properly formatted without www.
       formData.append("domainName", data.domainName.replace(/^www\./, ""));
       formData.append("description", data.description);
       formData.append("rating", data.rating.toString());
@@ -172,21 +184,63 @@ const EditProductCard = ({
       formData.append("keywords", JSON.stringify(data.keywords));
       formData.append("categories", JSON.stringify(data.categories));
 
-      await productsApi.updateProduct(token, product._id as string, formData);
+      // Handle image upload
+      if (selectedFile) {
+        // For file uploads, don't set imageURL at all rather than setting it to empty
+        
+        // Add the file
+        formData.append("image", selectedFile, selectedFile.name);
+      } else {
+        // Using image URL - only append if it's not empty to avoid the empty string warning
+        if (data.imageUrl) {
+          formData.append("imageURL", data.imageUrl);
+        }
+      }
+
+      // Use direct fetch for all updates for consistency
+      const headers: HeadersInit = {
+        Authorization: `Bearer ${token}`,
+      };
+
+      // Let the browser set the Content-Type for multipart/form-data
+      const response = await fetch(`${API_BASE_URL}/products/${product._id}`, {
+        method: "PUT",
+        headers: headers,
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Server responded with ${response.status}`);
+      }
+
+      const updatedProduct = await response.json();
+      
+      // Reset form and state
       form.reset();
+      setSelectedFile(null);
+      setImagePreview(null);
+      setImageUrlCleared(false);
       mutateProducts();
       setOpen(false);
     } catch (error) {
-      console.error(error);
+      console.error("Error updating product:", error);
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  // This useEffect manages form state and image preview when the dialog opens/closes
   useEffect(() => {
+    // Only run this effect if we're not currently uploading a file
+    if (fileUploading) return;
+    
     if (open) {
+      // Only reset the form with the product's image URL if it hasn't been explicitly cleared
+      const resetImageUrl = imageUrlCleared ? "" : product.imageURL;
+
       form.reset({
-        imageUrl: product.imageURL,
+        imageUrl: resetImageUrl,
+        imageFile: null,
         domainName: product.domainName,
         url: product.url,
         description: product.description,
@@ -196,8 +250,18 @@ const EditProductCard = ({
         keywords: product.keywords,
         categories: product.categories,
       });
+
+      // Only set the image preview if we're using the product's image URL and we don't already have a selected file
+      if (!selectedFile && resetImageUrl) {
+        setImagePreview(resetImageUrl);
+      }
+    } else {
+      // Clean up state when dialog is closed
+      setSelectedFile(null);
+      setImagePreview(null);
+      setImageUrlCleared(false); // Reset the cleared state when dialog closes
     }
-  }, [open, product, form]);
+  }, [open, product, form]); // Keep form but not imageUrlCleared to prevent unwanted refreshes
 
   // Extract domain name from URL
   const extractDomainName = (url: string) => {
@@ -230,25 +294,91 @@ const EditProductCard = ({
               name="imageUrl"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Banner Image URL</FormLabel>
+                  <FormLabel>Product Image</FormLabel>
                   <FormControl>
-                    <div>
-                      <Input
-                        placeholder="https://example.com/image.jpg"
-                        {...field}
-                        className="mb-2"
-                      />
-                      {field.value &&
-                        z.string().url().safeParse(field.value).success && (
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <FormLabel className="text-sm font-normal">
+                          Option 1: Enter Image URL
+                        </FormLabel>
+                        <div className="flex gap-2">
+                          <Input
+                            placeholder="https://example.com/image.jpg"
+                            {...field}
+                            onChange={(e) => {
+                              field.onChange(e);
+                              if (e.target.value) {
+                                setSelectedFile(null);
+                                setImagePreview(e.target.value);
+                              }
+                            }}
+                            disabled={!!selectedFile}
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              field.onChange("");
+                              setImagePreview(null);
+                              setImageUrlCleared(true); // Mark as explicitly cleared
+                            }}
+                            disabled={!!selectedFile || !field.value}
+                          >
+                            Clear
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <FormLabel className="text-sm font-normal">
+                          Option 2: Upload Image File
+                        </FormLabel>
+                        <Input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              // Set uploading state to prevent preview from being cleared
+                              setFileUploading(true);
+                              
+                              // Set the selected file first
+                              setSelectedFile(file);
+                              
+                              // Clear the URL field completely
+                              form.setValue("imageUrl", "", { shouldValidate: true });
+                              
+                              // Create preview URL
+                              const reader = new FileReader();
+                              reader.onloadend = () => {
+                                setImagePreview(reader.result as string);
+                                // End the uploading state
+                                setFileUploading(false);
+                              };
+                              reader.readAsDataURL(file);
+                            }
+                          }}
+                          disabled={!!field.value || fileUploading}
+                        />
+                      </div>
+
+                      {/* Preview area */}
+                      {imagePreview && imagePreview.length > 0 && (
+                        <div className="mt-4">
+                          <FormLabel className="text-sm font-normal">
+                            Preview:
+                          </FormLabel>
                           <Image
-                            src={field.value}
+                            src={imagePreview}
                             alt="Preview"
                             width={0}
                             height={0}
                             sizes="100vw"
-                            className="w-full h-auto"
+                            className="w-full h-auto mt-2"
                           />
-                        )}
+                        </div>
+                      )}
                     </div>
                   </FormControl>
                   <FormMessage />
@@ -497,7 +627,13 @@ const EditProductCard = ({
               )}
             />
             <DialogFooter>
-              <Button variant="outline">Cancel</Button>
+              <Button 
+                variant="outline" 
+                onClick={() => setOpen(false)}
+                type="button"
+              >
+                Cancel
+              </Button>
               <Button type="submit" disabled={isSubmitting}>
                 Save Product
               </Button>
