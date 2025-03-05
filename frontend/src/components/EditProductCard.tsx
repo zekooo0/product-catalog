@@ -1,7 +1,16 @@
 "use client";
 
+import { API_BASE_URL } from "@/lib/config";
+import { Product } from "@/lib/types";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Pencil, X } from "lucide-react";
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
+import { Checkbox } from "./ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -11,12 +20,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "./ui/dialog";
-import { Input } from "./ui/input";
-import { Checkbox } from "./ui/checkbox";
-import { Badge } from "./ui/badge";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import {
   Form,
   FormControl,
@@ -26,11 +29,7 @@ import {
   FormLabel,
   FormMessage,
 } from "./ui/form";
-import { Pencil, X } from "lucide-react";
-import { useState, useEffect } from "react";
-import { productsApi } from "@/lib/api/products";
-import { Product } from "@/lib/types";
-import { API_BASE_URL } from "@/lib/config";
+import { Input } from "./ui/input";
 
 type Reviewer = {
   name: string;
@@ -40,7 +39,7 @@ type Reviewer = {
 const productSchema = z.object({
   imageUrl: z.union([
     z.string().url("Please enter a valid URL"),
-    z.string().length(0) // Allow empty string
+    z.string().length(0), // Allow empty string
   ]),
   imageFile: z.any().optional(),
   domainName: z.string(),
@@ -187,7 +186,7 @@ const EditProductCard = ({
       // Handle image upload
       if (selectedFile) {
         // For file uploads, don't set imageURL at all rather than setting it to empty
-        
+
         // Add the file
         formData.append("image", selectedFile, selectedFile.name);
       } else {
@@ -214,7 +213,7 @@ const EditProductCard = ({
       }
 
       const updatedProduct = await response.json();
-      
+
       // Reset form and state
       form.reset();
       setSelectedFile(null);
@@ -233,7 +232,7 @@ const EditProductCard = ({
   useEffect(() => {
     // Only run this effect if we're not currently uploading a file
     if (fileUploading) return;
-    
+
     if (open) {
       // Only reset the form with the product's image URL if it hasn't been explicitly cleared
       const resetImageUrl = imageUrlCleared ? "" : product.imageURL;
@@ -342,13 +341,15 @@ const EditProductCard = ({
                             if (file) {
                               // Set uploading state to prevent preview from being cleared
                               setFileUploading(true);
-                              
+
                               // Set the selected file first
                               setSelectedFile(file);
-                              
+
                               // Clear the URL field completely
-                              form.setValue("imageUrl", "", { shouldValidate: true });
-                              
+                              form.setValue("imageUrl", "", {
+                                shouldValidate: true,
+                              });
+
                               // Create preview URL
                               const reader = new FileReader();
                               reader.onloadend = () => {
@@ -627,8 +628,8 @@ const EditProductCard = ({
               )}
             />
             <DialogFooter>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => setOpen(false)}
                 type="button"
               >
