@@ -43,24 +43,31 @@ const ProductImage = ({
   domainName: string;
   freeTrail: boolean;
 }) => (
-  <div className="relative h-[200px] w-full border-b ">
-    <a target="_blank" href={url}>
+  <div className="relative h-[220px] w-full border-b overflow-hidden bg-gray-50">
+    <a target="_blank" href={url} className="block h-full w-full">
       {imageURL && imageURL.trim() !== "" ? (
-        <Image
-          src={imageURL}
-          alt={domainName}
-          fill
-          className="object-cover bg-blend-multiply"
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        />
+        <div className="relative w-full h-full">
+          <Image
+            src={imageURL}
+            alt={domainName}
+            fill
+            className="object-cover hover:scale-105 transition-transform duration-300"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none"></div>
+        </div>
       ) : (
-        <div className="w-full h-full flex items-center justify-center bg-gray-200">
-          <span className="text-gray-500">No image available</span>
+        <div className="w-full h-full flex flex-col items-center justify-center bg-gray-100 text-center p-4">
+          <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center mb-2">
+            <span className="text-2xl font-bold text-gray-400">{domainName.charAt(0).toUpperCase()}</span>
+          </div>
+          <span className="text-gray-500 text-sm">No image available</span>
         </div>
       )}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
     </a>
-    {freeTrail && <Badge className="absolute top-2 right-2">Free Trail</Badge>}
+    {freeTrail && (
+      <Badge className="absolute top-2 right-2 z-10">Free Trial</Badge>
+    )}
   </div>
 );
 

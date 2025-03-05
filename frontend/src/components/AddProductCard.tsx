@@ -287,14 +287,17 @@ const AddProductCard = ({ mutateProducts }: { mutateProducts: () => void }) => {
                           <FormLabel className="text-sm font-normal">
                             Preview:
                           </FormLabel>
-                          <Image
-                            src={imagePreview || field.value || ""}
-                            alt="Preview"
-                            width={0}
-                            height={0}
-                            sizes="100vw"
-                            className="w-full h-auto mt-2"
-                          />
+                          <div className="relative h-[220px] w-full mt-2 border rounded-md overflow-hidden bg-gray-50">
+                            <div className="relative w-full h-full">
+                              <Image
+                                src={imagePreview || field.value || ""}
+                                alt="Preview"
+                                fill
+                                className="object-cover"
+                                sizes="100vw"
+                              />
+                            </div>
+                          </div>
                         </div>
                       )}
                     </div>
