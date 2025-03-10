@@ -16,6 +16,8 @@ app.use(
       "http://localhost:3000",
       "https://product-catalog-frontend.vercel.app",
       "http://affiliatelist.site",
+      "https://www.affiliatelist.site",
+      "https://affiliatelist.site"
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
