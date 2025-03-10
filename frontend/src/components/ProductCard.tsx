@@ -43,15 +43,15 @@ const ProductImage = ({
   domainName: string;
   freeTrail: boolean;
 }) => (
-  <div className="relative h-[220px] w-full border-b overflow-hidden bg-gray-50">
-    <a target="_blank" href={url} className="block h-full w-full">
+  <div className="relative w-full pt-[56.25%] border-b overflow-hidden bg-gray-50">
+    <a target="_blank" href={url} className="absolute inset-0">
       {imageURL && imageURL.trim() !== "" ? (
         <div className="relative w-full h-full">
           <Image
             src={imageURL}
             alt={domainName}
             fill
-            className="object-cover hover:scale-105 transition-transform duration-300"
+            className="object-contain hover:scale-105 transition-transform duration-300"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none"></div>
