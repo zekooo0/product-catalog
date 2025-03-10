@@ -1,14 +1,14 @@
-import { MetadataRoute } from 'next';
+import { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'Product Catalog',
-    short_name: 'Products',
-    description: 'Browse our complete product collection with easy category navigation',
+    short_name: 'Product Catalog',
+    description: 'Discover our extensive product catalog with easy category navigation and search capabilities',
     start_url: '/',
     display: 'standalone',
     background_color: '#ffffff',
-    theme_color: '#3b82f6',
+    theme_color: '#000000',
     icons: [
       {
         src: '/icon-192.png',
@@ -21,5 +21,5 @@ export default function manifest(): MetadataRoute.Manifest {
         type: 'image/png',
       },
     ],
-  };
+  }
 }
