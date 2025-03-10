@@ -18,7 +18,7 @@ app.use(
       "http://affiliatelist.site",
       "https://www.affiliatelist.site",
       "https://affiliatelist.site",
-      "https://product-catalog-omega-rosy.vercel.app/",
+      "https://product-catalog-omega-rosy.vercel.app",
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
