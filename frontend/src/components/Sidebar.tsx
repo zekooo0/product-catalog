@@ -53,7 +53,7 @@ const Sidebar = ({
               key={index}
               onClick={() => onCategorySelect(category.category)}
               className={cn(
-                "cursor-pointer capitalize py-2 px-3 rounded-md transition-colors flex justify-between",
+                "cursor-pointer capitalize rounded-md transition-colors flex justify-between",
                 selectedCategory === category.category
                   ? "bg-blue-500 text-white"
                   : "hover:bg-gray-100 hover:text-blue-500"
