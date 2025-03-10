@@ -24,7 +24,9 @@ const Header = ({
     <div className="flex flex-col gap-5 p-5 sticky top-0 z-50 bg-background">
       <div className="flex items-center justify-between ">
         <h1 className="scroll-m-20 text-2xl font-extrabold tracking-tight lg:text-3xl">
-          <Link href="/">Product Catalog</Link>
+          <Link href="/" className="text-blue-500">
+            AffiliateList.Site
+          </Link>
         </h1>
         <div className="flex items-center gap-2">
           <ModeToggle />
