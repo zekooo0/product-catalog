@@ -1,9 +1,23 @@
-export default function LoadingState() {
+import LoadingSpinner from "./LoadingSpinner";
+
+interface LoadingStateProps {
+  fullScreen?: boolean;
+  message?: string;
+  className?: string;
+}
+
+export default function LoadingState({ 
+  fullScreen = true,
+  message = "Loading...",
+  className = "",
+}: LoadingStateProps) {
+  const height = fullScreen ? "h-screen" : "h-[400px]";
+  
   return (
-    <div className="flex items-center justify-center w-full h-screen">
+    <div className={`flex items-center justify-center w-full ${height} ${className}`}>
       <div className="flex flex-col items-center space-y-4">
-        <div className="w-12 h-12 border-4 border-gray-200 rounded-full animate-spin border-t-blue-500"></div>
-        <p className="text-gray-500">Loading...</p>
+        <LoadingSpinner size="lg" />
+        <p className="text-muted-foreground">{message}</p>
       </div>
     </div>
   );

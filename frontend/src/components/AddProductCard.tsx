@@ -29,11 +29,15 @@ import {
 import { X } from "lucide-react";
 import { useState } from "react";
 import { productsApi } from "@/lib/api";
+import { ErrorService } from "@/lib/error-service";
+import LoadingSpinner from "./LoadingSpinner";
 
 type Reviewer = {
   name: string;
   url: string;
 };
+
+type SubmitStatus = "idle" | "loading" | "success" | "error";
 
 const productSchema = z.object({
   imageUrl: z.string().optional(),
@@ -64,6 +68,8 @@ const AddProductCard = ({ mutateProducts }: { mutateProducts: () => void }) => {
   });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<SubmitStatus>("idle");
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
@@ -151,6 +157,7 @@ const AddProductCard = ({ mutateProducts }: { mutateProducts: () => void }) => {
   };
 
   const onSubmit = async (data: ProductFormValues) => {
+    setSubmitStatus("loading");
     const token = window.localStorage.getItem("authToken") ?? "";
 
     try {
@@ -188,19 +195,37 @@ const AddProductCard = ({ mutateProducts }: { mutateProducts: () => void }) => {
         };
         await productsApi.createProduct(token, transformedData);
       }
-      form.reset();
-      setSelectedFile(null);
-      setImagePreview(null);
+      
+      // Set success state and trigger product list refresh
+      setSubmitStatus("success");
       mutateProducts();
+      
+      // Reset form after short delay to show success message
+      setTimeout(() => {
+        resetForm();
+        setIsDialogOpen(false);
+      }, 1500);
     } catch (error) {
-      console.error(error);
+      setSubmitStatus("error");
+      ErrorService.logError(error, { context: "AddProductCard.onSubmit" });
+      // Reset back to idle after displaying error briefly
+      setTimeout(() => setSubmitStatus("idle"), 3000);
     }
   };
 
-  const onClose = () => {
+  const resetForm = () => {
     form.reset();
     setSelectedFile(null);
     setImagePreview(null);
+    setKeywordInput("");
+    setCategoryInput("");
+    setReviewerInput({ name: "", url: "" });
+    setSubmitStatus("idle");
+  };
+
+  const onClose = () => {
+    resetForm();
+    setIsDialogOpen(false);
   };
 
   // Extract domain name from URL
@@ -214,7 +239,7 @@ const AddProductCard = ({ mutateProducts }: { mutateProducts: () => void }) => {
   };
 
   return (
-    <Dialog>
+    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
         <Button variant="outline">Add Product</Button>
       </DialogTrigger>
@@ -228,7 +253,7 @@ const AddProductCard = ({ mutateProducts }: { mutateProducts: () => void }) => {
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-4 "
+            className="space-y-4"
             id="add-product-form"
           >
             <FormField
@@ -549,12 +574,24 @@ const AddProductCard = ({ mutateProducts }: { mutateProducts: () => void }) => {
             />
           </form>
         </Form>
-        <DialogFooter>
+        <DialogFooter className="gap-2">
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit" form="add-product-form">
-            Save Product
+          <Button 
+            type="submit" 
+            form="add-product-form"
+            disabled={submitStatus === "loading" || submitStatus === "success"}
+            className="min-w-[100px]"
+          >
+            {submitStatus === "loading" && (
+              <LoadingSpinner size="sm" className="mr-2" />
+            )}
+            {submitStatus === "success" 
+              ? "Tool Added!" 
+              : submitStatus === "error"
+                ? "Failed"
+                : "Save Tool"}
           </Button>
         </DialogFooter>
       </DialogContent>

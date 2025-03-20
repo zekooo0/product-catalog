@@ -1,9 +1,29 @@
-const LoadingSpinner = () => {
+import { cn } from "@/lib/utils";
+
+interface LoadingSpinnerProps {
+  size?: "sm" | "md" | "lg" | "xl";
+  className?: string;
+}
+
+const sizeClasses = {
+  sm: "w-4 h-4",
+  md: "w-6 h-6",
+  lg: "w-8 h-8",
+  xl: "w-12 h-12",
+};
+
+const LoadingSpinner = ({ 
+  size = "md", 
+  className 
+}: LoadingSpinnerProps) => {
   return (
-    <div role="status">
+    <div role="status" className={className}>
       <svg
         aria-hidden="true"
-        className="inline w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+        className={cn(
+          "inline text-gray-200 animate-spin dark:text-gray-600 fill-primary",
+          sizeClasses[size]
+        )}
         viewBox="0 0 100 101"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"

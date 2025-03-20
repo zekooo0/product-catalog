@@ -1,8 +1,17 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Product Catalog Frontend
+
+A Next.js application for managing product catalogs efficiently.
 
 ## Getting Started
 
-First, run the development server:
+First, set up your environment variables:
+
+```bash
+# Copy the example env file and modify as needed
+cp .env.local.example .env.local
+```
+
+Then, run the development server:
 
 ```bash
 npm run dev
@@ -10,13 +19,61 @@ npm run dev
 yarn dev
 # or
 pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment Variables
+
+The application requires the following environment variables:
+
+- `NEXT_PUBLIC_API_URL` - API endpoint URL (required)
+- `NEXT_PUBLIC_FEATURE_NEW_UI` - Feature flag for new UI (optional, defaults to false)
+
+These can be set in a `.env.local` file at the root of the project.
+
+## Project Structure
+
+```
+frontend/
+├── public/        # Static assets
+├── src/
+│   ├── app/       # Next.js app directory (pages, layouts)
+│   ├── components/# React components
+│   ├── contexts/  # React contexts for state management
+│   ├── hooks/     # Custom React hooks
+│   └── lib/       # Utility functions, types, and configuration
+└── ...            # Configuration files
+```
+
+## Main Features
+
+- Product catalog management
+- Product categorization
+- Search and filtering
+- Responsive design with dark/light mode support
+- Error handling and logging
+
+## Error Handling
+
+The application includes a comprehensive error handling system:
+
+- `ErrorBoundary` component for catching React errors
+- `ErrorService` for centralized error logging and formatting
+- User-friendly error messages
+
+## API Integration
+
+The application connects to a backend API for data retrieval and manipulation:
+
+- Uses SWR for data fetching with caching
+- Includes retry logic and error handling
+- Environment-based API configuration
+
+## Deployment
+
+The application is configured for deployment on Vercel. The production environment
+variables must be set in the Vercel dashboard.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 

@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/contexts/auth-context";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Analytics } from "@vercel/analytics/react";
+import { APP_CONFIG } from "@/lib/config";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,43 +19,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Product Catalog | Browse Our Complete Collection",
-  description:
-    "Discover our extensive product catalog with easy category navigation, detailed product information, and powerful search capabilities. Find exactly what you need quickly and efficiently.",
-  keywords:
-    "product catalog, product categories, inventory management, product search, product database",
-  authors: [{ name: "Product Catalog Team" }],
-  creator: "Product Catalog",
-  publisher: "Product Catalog",
+  title: APP_CONFIG.APP_NAME,
+  description: APP_CONFIG.APP_DESCRIPTION,
+  metadataBase: new URL('https://product-catalog.vercel.app'),
   openGraph: {
-    type: "website",
-    locale: "en_US",
-    url: "https://www.affiliatelist.site/",
-    title: "Product Catalog | Browse Our Complete Collection",
-    description:
-      "Discover our extensive product catalog with easy category navigation, detailed product information, and powerful search capabilities.",
-    siteName: "Product Catalog",
-    images: [
-      {
-        url: "/og-image.jpg",
-        width: 1200,
-        height: 630,
-        alt: "Product Catalog thumbnail",
-      },
-    ],
+    type: 'website',
+    title: APP_CONFIG.APP_NAME,
+    description: APP_CONFIG.APP_DESCRIPTION,
   },
-  twitter: {
-    card: "summary_large_image",
-    title: "Product Catalog | Browse Our Complete Collection",
-    description:
-      "Discover our extensive product catalog with easy category navigation, detailed product information, and powerful search capabilities.",
-    images: ["/twitter-image.jpg"],
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-  metadataBase: new URL("https://www.affiliatelist.site/"),
 };
 
 export default function RootLayout({

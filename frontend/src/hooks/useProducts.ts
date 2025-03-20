@@ -2,7 +2,7 @@ import { API_BASE_URL } from "@/lib/config";
 import { Product } from "@/lib/types";
 import { fetcher } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useCallback, useMemo } from "react";
 import useSWR from "swr";
 
 interface UseProductsOptions {
@@ -21,49 +21,50 @@ export function useProducts(options: UseProductsOptions = {}) {
   const searchParams = useSearchParams();
   const search = searchParams.get("search");
 
-  // Reset category and letter when search is active
-  useEffect(() => {
-    if (search) {
-      setSelectedCategory(null);
-      setSelectedLetter("");
-    }
-  }, [search]);
+  // Memoize the filters creation to prevent unnecessary API calls
+  const filtersString = useMemo(() => {
+    const params = new URLSearchParams({
+      ...(selectedCategory && { category: selectedCategory }),
+      ...(selectedLetter && { letter: selectedLetter }),
+      ...(search && { search }),
+    }).toString();
+    return params;
+  }, [selectedCategory, selectedLetter, search]);
 
-  // Create custom setter functions that reset other filters
-  const setSelectedCategoryAndResetOthers = (category: string | null) => {
-    setSelectedCategory(category);
-    if (category) {
-      setSelectedLetter("");
-    }
-  };
-
-  const setSelectedLetterAndResetOthers = (letter: string) => {
-    setSelectedLetter(letter);
-    if (letter) {
-      setSelectedCategory(null);
-    }
-  };
-
-  // Only include one filter at a time based on priority: search > letter > category
-  let activeFilter = {};
-  if (search) {
-    activeFilter = { search };
-  } else if (selectedLetter) {
-    activeFilter = { letter: selectedLetter.toLowerCase() };
-  } else if (selectedCategory) {
-    activeFilter = { category: selectedCategory };
-  }
-
-  const filters = new URLSearchParams(activeFilter).toString();
-
-  const apiUrl = `${API_BASE_URL}/products${filters ? `?${filters}` : ""}`;
+  const apiUrl = `${API_BASE_URL}/products${filtersString ? `?${filtersString}` : ""}`;
 
   const {
     data: products,
     error,
     isLoading,
     mutate,
-  } = useSWR<Product[]>(apiUrl, fetcher);
+  } = useSWR<Product[]>(
+    apiUrl, 
+    fetcher, 
+    {
+      revalidateOnFocus: false,
+      revalidateIfStale: true,
+      dedupingInterval: 10000, // 10 seconds
+      errorRetryCount: 3,
+      onErrorRetry: (error, key, config, revalidate, { retryCount }) => {
+        // Only retry on network errors and 5xx errors
+        if (error.status >= 400 && error.status < 500) return;
+        
+        // Exponential backoff
+        const delay = Math.min(1000 * 2 ** retryCount, 30000);
+        setTimeout(() => revalidate({ retryCount }), delay);
+      },
+    }
+  );
+
+  // Memoize callbacks
+  const setCategory = useCallback((category: string | null) => {
+    setSelectedCategory(category);
+  }, []);
+
+  const setLetter = useCallback((letter: string) => {
+    setSelectedLetter(letter);
+  }, []);
 
   return {
     products: products ?? [],
@@ -75,7 +76,7 @@ export function useProducts(options: UseProductsOptions = {}) {
       selectedLetter,
       search,
     },
-    setSelectedCategory: setSelectedCategoryAndResetOthers,
-    setSelectedLetter: setSelectedLetterAndResetOthers,
+    setSelectedCategory: setCategory,
+    setSelectedLetter: setLetter,
   };
 }
