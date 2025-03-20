@@ -30,6 +30,7 @@ import {
   FormMessage,
 } from "./ui/form";
 import { Input } from "./ui/input";
+import { cn } from "@/lib/utils";
 
 type Reviewer = {
   name: string;
@@ -73,11 +74,13 @@ const EditProductCard = ({
     url: "",
   });
   const [open, setOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageUrlCleared, setImageUrlCleared] = useState(false);
   const [fileUploading, setFileUploading] = useState(false);
+  const [originalData, setOriginalData] = useState<ProductFormValues | null>(null);
+  const [hasChanges, setHasChanges] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
@@ -93,7 +96,10 @@ const EditProductCard = ({
       keywords: product.keywords,
       categories: product.categories,
     },
+    mode: "onChange",
   });
+
+  const formValues = form.watch();
 
   const handleAddKeyword = () => {
     if (keywordInput.trim()) {
@@ -165,84 +171,105 @@ const EditProductCard = ({
   };
 
   const onSubmit = async (data: ProductFormValues) => {
-    const token = window.localStorage.getItem("authToken") ?? "";
-
+    setSubmitStatus('loading');
     try {
-      setIsSubmitting(true);
-
       // Create a new FormData instance
       const formData = new FormData();
+      const token = localStorage.getItem("authToken") || "";
 
-      // Basic product data
+      // Set fileUploading state if we have a file
+      if (selectedFile) {
+        setFileUploading(true);
+      }
+
+      // Add form fields to the formData
       formData.append("url", data.url);
       formData.append("domainName", data.domainName.replace(/^www\./, ""));
       formData.append("description", data.description);
       formData.append("rating", data.rating.toString());
-      formData.append("freeTrialAvailable", data.freeTrial.toString());
+      formData.append("freeTrial", data.freeTrial.toString());
       formData.append("reviewers", JSON.stringify(data.reviewers));
       formData.append("keywords", JSON.stringify(data.keywords));
       formData.append("categories", JSON.stringify(data.categories));
 
-      // Handle image upload
+      // If we have a selected file, add it to the form data
       if (selectedFile) {
-        // For file uploads, don't set imageURL at all rather than setting it to empty
-
-        // Add the file
-        formData.append("image", selectedFile, selectedFile.name);
+        formData.append("image", selectedFile);
+      } else if (imageUrlCleared) {
+        // If the image URL was cleared, send an empty string
+        formData.append("imageURL", "");
       } else {
-        // Using image URL - only append if it's not empty to avoid the empty string warning
-        if (data.imageUrl) {
-          formData.append("imageURL", data.imageUrl);
+        // Otherwise, send the current image URL
+        formData.append("imageURL", data.imageUrl);
+      }
+
+      // Call the API to update the product
+      const updatedProduct = await fetch(
+        `${API_BASE_URL}/products/${product._id}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
         }
+      );
+
+      if (!updatedProduct.ok) {
+        throw new Error("Failed to update product");
       }
 
-      // Use direct fetch for all updates for consistency
-      const headers: HeadersInit = {
-        Authorization: `Bearer ${token}`,
-      };
-
-      // Let the browser set the Content-Type for multipart/form-data
-      const response = await fetch(`${API_BASE_URL}/products/${product._id}`, {
-        method: "PUT",
-        headers: headers,
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error(`Server responded with ${response.status}`);
-      }
-
-      await response.json();
-
-      // Reset form and state
-      form.reset();
-      setSelectedFile(null);
-      setImagePreview(null);
-      setImageUrlCleared(false);
+      // Update the product list
       mutateProducts();
-      setOpen(false);
+
+      // Show success state
+      setSubmitStatus('success');
+      
+      // Reset form state after a short delay
+      setTimeout(() => {
+        setOpen(false);
+        setFileUploading(false);
+        setHasChanges(false);
+        setSubmitStatus('idle');
+      }, 1500);
+      
     } catch (error) {
       console.error("Error updating product:", error);
-    } finally {
-      setIsSubmitting(false);
+      setFileUploading(false);
+      setSubmitStatus('error');
+      
+      // Reset to idle state after showing error
+      setTimeout(() => {
+        setSubmitStatus('idle');
+      }, 3000);
     }
   };
 
   // This useEffect manages form state and image preview when the dialog opens/closes
   useEffect(() => {
-    // Only run this effect if we're not currently uploading a file
-    if (fileUploading) return;
-
-    if (open) {
-      // Only reset the form with the product's image URL if it hasn't been explicitly cleared
-      const resetImageUrl = imageUrlCleared ? "" : product.imageURL;
-
+    if (open && product) {
+      // Reset the form with product data
+      const resetImageUrl = product.imageURL || "";
       form.reset({
         imageUrl: resetImageUrl,
         imageFile: null,
-        domainName: product.domainName,
-        url: product.url,
-        description: product.description,
+        domainName: product.domainName || "",
+        url: product.url || "",
+        description: product.description || "",
+        rating: product.rating,
+        freeTrial: product.freeTrialAvailable,
+        reviewers: product.reviewers,
+        keywords: product.keywords,
+        categories: product.categories,
+      });
+
+      // Store original data for change detection
+      setOriginalData({
+        imageUrl: resetImageUrl,
+        imageFile: null,
+        domainName: product.domainName || "",
+        url: product.url || "",
+        description: product.description || "",
         rating: product.rating,
         freeTrial: product.freeTrialAvailable,
         reviewers: product.reviewers,
@@ -259,8 +286,31 @@ const EditProductCard = ({
       setSelectedFile(null);
       setImagePreview(null);
       setImageUrlCleared(false); // Reset the cleared state when dialog closes
+      setHasChanges(false);
     }
-  }, [open, product, form]); // Keep form but not imageUrlCleared to prevent unwanted refreshes
+  }, [open, product, form, selectedFile, fileUploading]);
+
+  useEffect(() => {
+    if (!originalData || !open) return;
+    
+    // Check if any values have changed
+    const hasFieldChanges = 
+      formValues.url !== originalData.url ||
+      formValues.domainName !== originalData.domainName ||
+      formValues.description !== originalData.description ||
+      formValues.rating !== originalData.rating ||
+      formValues.freeTrial !== originalData.freeTrial ||
+      JSON.stringify(formValues.reviewers) !== JSON.stringify(originalData.reviewers) ||
+      JSON.stringify(formValues.keywords) !== JSON.stringify(originalData.keywords) ||
+      JSON.stringify(formValues.categories) !== JSON.stringify(originalData.categories);
+
+    // Set hasChanges if any field changed or there are file/image changes
+    if (hasFieldChanges || selectedFile || imageUrlCleared) {
+      setHasChanges(true);
+    } else {
+      setHasChanges(false);
+    }
+  }, [formValues, originalData, selectedFile, imageUrlCleared, open]);
 
   // Extract domain name from URL
   const extractDomainName = (url: string) => {
@@ -287,7 +337,7 @@ const EditProductCard = ({
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 ">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" id="edit-product-form">
             <FormField
               control={form.control}
               name="imageUrl"
@@ -638,8 +688,16 @@ const EditProductCard = ({
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                Save Product
+              <Button 
+                type="submit" 
+                form="edit-product-form"
+                disabled={(!hasChanges && !form.formState.isDirty) || submitStatus === 'loading' || submitStatus === 'success'}
+                className="min-w-[140px]"
+                variant={submitStatus === 'error' ? 'destructive' : 'default'}
+              >
+                {submitStatus === 'loading' ? 'Saving...' : 
+                 submitStatus === 'success' ? 'Tool Updated!' : 
+                 submitStatus === 'error' ? 'Failed' : 'Save Changes'}
               </Button>
             </DialogFooter>
           </form>
@@ -650,3 +708,4 @@ const EditProductCard = ({
 };
 
 export default EditProductCard;
+

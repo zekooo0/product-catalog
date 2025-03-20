@@ -75,7 +75,7 @@ export const truncateText = (text: string, maxLength: number = 100) => {
 export const safeJsonParse = <T>(json: string, fallback: T): T => {
   try {
     return JSON.parse(json) as T;
-  } catch (e) {
+  } catch {
     return fallback;
   }
 };

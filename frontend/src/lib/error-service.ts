@@ -25,7 +25,7 @@ interface ErrorDetails {
   message: string;
   type: ErrorType;
   level: ErrorLevel;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
 }
 
 /**
@@ -35,16 +35,16 @@ export const ErrorService = {
   /**
    * Log an error with metadata
    */
-  logError: (error: Error | ApiError | any, metadata: Record<string, any> = {}) => {
+  logError: (error: Error | ApiError | unknown, metadata: Record<string, unknown> = {}) => {
     // Extract error details
     const errorDetails: ErrorDetails = {
-      message: error?.message || 'Unknown error occurred',
+      message: error instanceof Error ? error.message : 'Unknown error occurred',
       type: getErrorType(error),
       level: getErrorLevel(error),
       metadata: {
         ...metadata,
         timestamp: new Date().toISOString(),
-        stack: error?.stack,
+        stack: error instanceof Error ? error.stack : undefined,
       },
     };
 
@@ -70,7 +70,7 @@ export const ErrorService = {
   /**
    * Format user-friendly error message
    */
-  getUserFriendlyMessage: (error: Error | ApiError | any): string => {
+  getUserFriendlyMessage: (error: Error | ApiError | unknown): string => {
     if (error instanceof ApiError) {
       // Handle API errors based on status code
       switch (error.status) {
@@ -92,7 +92,7 @@ export const ErrorService = {
     }
 
     // Generic network errors
-    if (error?.message?.includes('fetch') || error?.message?.includes('network')) {
+    if (error instanceof Error && (error.message.includes('fetch') || error.message.includes('network'))) {
       return 'Unable to connect to the server. Please check your internet connection.';
     }
 
@@ -104,21 +104,26 @@ export const ErrorService = {
 /**
  * Determine error type based on error properties
  */
-function getErrorType(error: any): ErrorType {
+function getErrorType(error: unknown): ErrorType {
   if (error instanceof ApiError) {
     return ErrorType.API;
   }
 
-  if (error?.message?.includes('auth') || error?.message?.includes('login') || error?.name?.includes('Auth')) {
-    return ErrorType.AUTH;
-  }
+  if (error instanceof Error) {
+    const errorMsg = error.message.toLowerCase();
+    const errorName = error.name.toLowerCase();
+    
+    if (errorMsg.includes('auth') || errorMsg.includes('login') || errorName.includes('auth')) {
+      return ErrorType.AUTH;
+    }
 
-  if (error?.message?.includes('validation') || error?.name?.includes('Validation')) {
-    return ErrorType.VALIDATION;
-  }
+    if (errorMsg.includes('validation') || errorName.includes('validation')) {
+      return ErrorType.VALIDATION;
+    }
 
-  if (error?.message?.includes('network') || error?.message?.includes('fetch') || error?.name?.includes('Network')) {
-    return ErrorType.NETWORK;
+    if (errorMsg.includes('network') || errorMsg.includes('fetch') || errorName.includes('network')) {
+      return ErrorType.NETWORK;
+    }
   }
 
   return ErrorType.UNKNOWN;
@@ -127,7 +132,7 @@ function getErrorType(error: any): ErrorType {
 /**
  * Determine error severity level based on error properties
  */
-function getErrorLevel(error: any): ErrorLevel {
+function getErrorLevel(error: unknown): ErrorLevel {
   if (error instanceof ApiError) {
     if (error.status >= 500) {
       return ErrorLevel.CRITICAL;

@@ -20,17 +20,12 @@ if (process.env.NODE_ENV === 'development') {
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
   images: {
     remotePatterns: [
       {
         protocol: "https",
         hostname: "**",
       },
-      {
-        protocol: "https",
-        hostname: "res.cloudinary.com",
-      }
     ],
   },
   // Add useful headers for security
