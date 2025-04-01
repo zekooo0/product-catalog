@@ -31,6 +31,7 @@ import { useState } from "react";
 import { productsApi } from "@/lib/api";
 import { ErrorService } from "@/lib/error-service";
 import LoadingSpinner from "./LoadingSpinner";
+import { useToast } from "@/hooks/use-toast";
 
 type Reviewer = {
   name: string;
@@ -70,6 +71,8 @@ const AddProductCard = ({ mutateProducts }: { mutateProducts: () => void }) => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<SubmitStatus>("idle");
+
+  const { toast } = useToast();
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
@@ -195,11 +198,15 @@ const AddProductCard = ({ mutateProducts }: { mutateProducts: () => void }) => {
         };
         await productsApi.createProduct(token, transformedData);
       }
-      
+
       // Set success state and trigger product list refresh
       setSubmitStatus("success");
       mutateProducts();
-      
+
+      toast({
+        title: "Product added",
+        description: "Product added successfully",
+      });
       // Reset form after short delay to show success message
       setTimeout(() => {
         resetForm();
@@ -578,8 +585,8 @@ const AddProductCard = ({ mutateProducts }: { mutateProducts: () => void }) => {
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             form="add-product-form"
             disabled={submitStatus === "loading" || submitStatus === "success"}
             className="min-w-[100px]"
@@ -587,11 +594,11 @@ const AddProductCard = ({ mutateProducts }: { mutateProducts: () => void }) => {
             {submitStatus === "loading" && (
               <LoadingSpinner size="sm" className="mr-2" />
             )}
-            {submitStatus === "success" 
-              ? "Tool Added!" 
+            {submitStatus === "success"
+              ? "Tool Added!"
               : submitStatus === "error"
-                ? "Failed"
-                : "Save Tool"}
+              ? "Failed"
+              : "Save Tool"}
           </Button>
         </DialogFooter>
       </DialogContent>

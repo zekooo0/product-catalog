@@ -30,6 +30,7 @@ import {
   FormMessage,
 } from "./ui/form";
 import { Input } from "./ui/input";
+import { useToast } from "@/hooks/use-toast";
 
 type Reviewer = {
   name: string;
@@ -77,9 +78,15 @@ const EditProductCard = ({
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageUrlCleared, setImageUrlCleared] = useState(false);
   const [fileUploading, setFileUploading] = useState(false);
-  const [originalData, setOriginalData] = useState<ProductFormValues | null>(null);
+  const [originalData, setOriginalData] = useState<ProductFormValues | null>(
+    null
+  );
   const [hasChanges, setHasChanges] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [submitStatus, setSubmitStatus] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
+
+  const { toast } = useToast();
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
@@ -170,7 +177,7 @@ const EditProductCard = ({
   };
 
   const onSubmit = async (data: ProductFormValues) => {
-    setSubmitStatus('loading');
+    setSubmitStatus("loading");
     try {
       // Create a new FormData instance
       const formData = new FormData();
@@ -222,24 +229,28 @@ const EditProductCard = ({
       mutateProducts();
 
       // Show success state
-      setSubmitStatus('success');
-      
+      setSubmitStatus("success");
+
+      toast({
+        title: "Product updated",
+        description: "Product updated successfully",
+      });
+
       // Reset form state after a short delay
       setTimeout(() => {
         setOpen(false);
         setFileUploading(false);
         setHasChanges(false);
-        setSubmitStatus('idle');
+        setSubmitStatus("idle");
       }, 1500);
-      
     } catch (error) {
       console.error("Error updating product:", error);
       setFileUploading(false);
-      setSubmitStatus('error');
-      
+      setSubmitStatus("error");
+
       // Reset to idle state after showing error
       setTimeout(() => {
-        setSubmitStatus('idle');
+        setSubmitStatus("idle");
       }, 3000);
     }
   };
@@ -291,17 +302,20 @@ const EditProductCard = ({
 
   useEffect(() => {
     if (!originalData || !open) return;
-    
+
     // Check if any values have changed
-    const hasFieldChanges = 
+    const hasFieldChanges =
       formValues.url !== originalData.url ||
       formValues.domainName !== originalData.domainName ||
       formValues.description !== originalData.description ||
       formValues.rating !== originalData.rating ||
       formValues.freeTrial !== originalData.freeTrial ||
-      JSON.stringify(formValues.reviewers) !== JSON.stringify(originalData.reviewers) ||
-      JSON.stringify(formValues.keywords) !== JSON.stringify(originalData.keywords) ||
-      JSON.stringify(formValues.categories) !== JSON.stringify(originalData.categories);
+      JSON.stringify(formValues.reviewers) !==
+        JSON.stringify(originalData.reviewers) ||
+      JSON.stringify(formValues.keywords) !==
+        JSON.stringify(originalData.keywords) ||
+      JSON.stringify(formValues.categories) !==
+        JSON.stringify(originalData.categories);
 
     // Set hasChanges if any field changed or there are file/image changes
     if (hasFieldChanges || selectedFile || imageUrlCleared) {
@@ -336,7 +350,11 @@ const EditProductCard = ({
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" id="edit-product-form">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-4"
+            id="edit-product-form"
+          >
             <FormField
               control={form.control}
               name="imageUrl"
@@ -687,16 +705,24 @@ const EditProductCard = ({
               >
                 Cancel
               </Button>
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 form="edit-product-form"
-                disabled={(!hasChanges && !form.formState.isDirty) || submitStatus === 'loading' || submitStatus === 'success'}
+                disabled={
+                  (!hasChanges && !form.formState.isDirty) ||
+                  submitStatus === "loading" ||
+                  submitStatus === "success"
+                }
                 className="min-w-[140px]"
-                variant={submitStatus === 'error' ? 'destructive' : 'default'}
+                variant={submitStatus === "error" ? "destructive" : "default"}
               >
-                {submitStatus === 'loading' ? 'Saving...' : 
-                 submitStatus === 'success' ? 'Tool Updated!' : 
-                 submitStatus === 'error' ? 'Failed' : 'Save Changes'}
+                {submitStatus === "loading"
+                  ? "Saving..."
+                  : submitStatus === "success"
+                  ? "Tool Updated!"
+                  : submitStatus === "error"
+                  ? "Failed"
+                  : "Save Changes"}
               </Button>
             </DialogFooter>
           </form>
@@ -707,4 +733,3 @@ const EditProductCard = ({
 };
 
 export default EditProductCard;
-
