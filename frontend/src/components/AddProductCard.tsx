@@ -70,6 +70,7 @@ const AddProductCard = ({ mutateProducts }: { mutateProducts: () => void }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isDialogOpen2, setIsDialogOpen2] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<SubmitStatus>("idle");
 
   const { toast } = useToast();
@@ -215,6 +216,7 @@ const AddProductCard = ({ mutateProducts }: { mutateProducts: () => void }) => {
     } catch (error) {
       setSubmitStatus("error");
       ErrorService.logError(error, { context: "AddProductCard.onSubmit" });
+      onClose2();
       // Reset back to idle after displaying error briefly
       setTimeout(() => setSubmitStatus("idle"), 3000);
     }
@@ -233,6 +235,11 @@ const AddProductCard = ({ mutateProducts }: { mutateProducts: () => void }) => {
   const onClose = () => {
     resetForm();
     setIsDialogOpen(false);
+  };
+
+  const onClose2 = () => {
+    resetForm();
+    setIsDialogOpen2(false);
   };
 
   // Extract domain name from URL
@@ -585,21 +592,39 @@ const AddProductCard = ({ mutateProducts }: { mutateProducts: () => void }) => {
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button
-            type="submit"
-            form="add-product-form"
-            disabled={submitStatus === "loading" || submitStatus === "success"}
-            className="min-w-[100px]"
-          >
-            {submitStatus === "loading" && (
-              <LoadingSpinner size="sm" className="mr-2" />
-            )}
-            {submitStatus === "success"
-              ? "Tool Added!"
-              : submitStatus === "error"
-              ? "Failed"
-              : "Save Tool"}
-          </Button>
+
+          <Dialog open={isDialogOpen2} onOpenChange={setIsDialogOpen2}>
+            <DialogTrigger asChild>
+              <Button>Add Tool</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Add Tool</DialogTitle>
+                <DialogDescription>
+                  Are you sure you want to add this tool?
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button
+                  type="submit"
+                  form="add-product-form"
+                  disabled={
+                    submitStatus === "loading" || submitStatus === "success"
+                  }
+                  className="min-w-[100px]"
+                >
+                  {submitStatus === "loading" && (
+                    <LoadingSpinner size="sm" className="mr-2" />
+                  )}
+                  {submitStatus === "success"
+                    ? "Tool Added!"
+                    : submitStatus === "error"
+                    ? "Failed"
+                    : "Save Tool"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </DialogFooter>
       </DialogContent>
     </Dialog>

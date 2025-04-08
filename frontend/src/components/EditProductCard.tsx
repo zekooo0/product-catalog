@@ -74,6 +74,7 @@ const EditProductCard = ({
     url: "",
   });
   const [open, setOpen] = useState(false);
+  const [isDialogOpen2, setIsDialogOpen2] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageUrlCleared, setImageUrlCleared] = useState(false);
@@ -705,25 +706,50 @@ const EditProductCard = ({
               >
                 Cancel
               </Button>
-              <Button
-                type="submit"
-                form="edit-product-form"
-                disabled={
-                  (!hasChanges && !form.formState.isDirty) ||
-                  submitStatus === "loading" ||
-                  submitStatus === "success"
-                }
-                className="min-w-[140px]"
-                variant={submitStatus === "error" ? "destructive" : "default"}
-              >
-                {submitStatus === "loading"
-                  ? "Saving..."
-                  : submitStatus === "success"
-                  ? "Tool Updated!"
-                  : submitStatus === "error"
-                  ? "Failed"
-                  : "Save Changes"}
-              </Button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button
+                    disabled={
+                      (!hasChanges && !form.formState.isDirty) ||
+                      submitStatus === "loading" ||
+                      submitStatus === "success"
+                    }
+                  >
+                    Update Tool
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Update Tool</DialogTitle>
+                    <DialogDescription>
+                      Are you sure you want to update this tool?
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter>
+                    <Button
+                      type="submit"
+                      form="edit-product-form"
+                      disabled={
+                        (!hasChanges && !form.formState.isDirty) ||
+                        submitStatus === "loading" ||
+                        submitStatus === "success"
+                      }
+                      className="min-w-[140px]"
+                      variant={
+                        submitStatus === "error" ? "destructive" : "default"
+                      }
+                    >
+                      {submitStatus === "loading"
+                        ? "Saving..."
+                        : submitStatus === "success"
+                        ? "Tool Updated!"
+                        : submitStatus === "error"
+                        ? "Failed"
+                        : "Save Changes"}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </DialogFooter>
           </form>
         </Form>
