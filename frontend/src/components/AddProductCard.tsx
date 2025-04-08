@@ -70,7 +70,6 @@ const AddProductCard = ({ mutateProducts }: { mutateProducts: () => void }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isDialogOpen2, setIsDialogOpen2] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<SubmitStatus>("idle");
 
   const { toast } = useToast();
@@ -216,7 +215,6 @@ const AddProductCard = ({ mutateProducts }: { mutateProducts: () => void }) => {
     } catch (error) {
       setSubmitStatus("error");
       ErrorService.logError(error, { context: "AddProductCard.onSubmit" });
-      onClose2();
       // Reset back to idle after displaying error briefly
       setTimeout(() => setSubmitStatus("idle"), 3000);
     }
@@ -235,11 +233,6 @@ const AddProductCard = ({ mutateProducts }: { mutateProducts: () => void }) => {
   const onClose = () => {
     resetForm();
     setIsDialogOpen(false);
-  };
-
-  const onClose2 = () => {
-    resetForm();
-    setIsDialogOpen2(false);
   };
 
   // Extract domain name from URL
@@ -593,7 +586,7 @@ const AddProductCard = ({ mutateProducts }: { mutateProducts: () => void }) => {
             Cancel
           </Button>
 
-          <Dialog open={isDialogOpen2} onOpenChange={setIsDialogOpen2}>
+          <Dialog>
             <DialogTrigger asChild>
               <Button>Add Tool</Button>
             </DialogTrigger>

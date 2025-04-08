@@ -74,7 +74,6 @@ const EditProductCard = ({
     url: "",
   });
   const [open, setOpen] = useState(false);
-  const [isDialogOpen2, setIsDialogOpen2] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageUrlCleared, setImageUrlCleared] = useState(false);
