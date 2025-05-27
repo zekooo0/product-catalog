@@ -1,11 +1,12 @@
 "use client";
+import { useAuth } from "@/contexts/auth-context";
 import Link from "next/link";
 import AlphabetFilter from "./AlphabetFilter";
+import { RainbowButton } from "./magicui/rainbow-button";
 import Search from "./Search";
 import { ModeToggle } from "./theme-toggle";
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
-import { useAuth } from "@/contexts/auth-context";
 
 const Header = ({
   selectedLetter,
@@ -29,35 +30,8 @@ const Header = ({
               AffiliateList.Site
             </Link>
           </h1>
-          <div className="mt-2 ">
-            <a
-              href="/Comprehensive Guide To Affiliate Programs.pdf"
-              download="Comprehensive Guide To Affiliate Programs.pdf"
-              className="flex items-center justify-center gap-2 text-red-500 hover:underline break-words max-w-xs  border border-dashed p-2 border-red-500 rounded-md"
-            >
-              <div className="bg-red-500 rounded-full p-2">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="white"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                  <polyline points="7 10 12 15 17 10"></polyline>
-                  <line x1="12" y1="15" x2="12" y2="3"></line>
-                </svg>
-              </div>
-              <span className="font-medium text-center">
-                Free Comprehensive Guide To Affiliate Marketing
-              </span>
-            </a>
-          </div>
         </div>
+        <RainbowButton>Your #1 go to site for affiliate tools</RainbowButton>
         <div className="flex items-center gap-2">
           <ModeToggle />
           {isAuthenticated ? (

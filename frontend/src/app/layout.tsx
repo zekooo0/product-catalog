@@ -7,6 +7,7 @@ import { AuthProvider } from "@/contexts/auth-context";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Analytics } from "@vercel/analytics/react";
 import { APP_CONFIG } from "@/lib/config";
+import Banner from "@/components/Banner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -21,9 +22,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: APP_CONFIG.APP_NAME,
   description: APP_CONFIG.APP_DESCRIPTION,
-  metadataBase: new URL('https://product-catalog.vercel.app'),
+  metadataBase: new URL("https://product-catalog.vercel.app"),
   openGraph: {
-    type: 'website',
+    type: "website",
     title: APP_CONFIG.APP_NAME,
     description: APP_CONFIG.APP_DESCRIPTION,
   },
@@ -45,6 +46,8 @@ export default function RootLayout({
         >
           <NuqsAdapter>
             <AuthProvider>
+              <Banner />
+
               {children}
               <Analytics />
               <Toaster />
