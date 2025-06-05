@@ -3,7 +3,7 @@ import Image from "next/image";
 export default function SocialIcons() {
   const list: { image: string; href: string }[] = [
     {
-      image: "/facebook.png",
+      image: "/Facebook.png",
       href: "https://www.facebook.com/profile.php?id=61574098654423",
     },
     {
@@ -11,15 +11,15 @@ export default function SocialIcons() {
       href: "https://www.instagram.com/affiliatelist.site/",
     },
     {
-      image: "/threads.png",
+      image: "/Threads.png",
       href: "https://www.threads.com/@affiliatelist.site?xmt=AQGz05ihWsELRGE0OeaAAejewGShTojj6Z2BqgcobwLkB7A",
     },
     {
-      image: "/tiktok.png",
+      image: "/TikTok.png",
       href: "https://www.tiktok.com/@makemoneyonlinetools",
     },
     {
-      image: "/youtube.png",
+      image: "/YouTube.png",
       href: "https://www.youtube.com/@MakeMoneyOnlineTools",
     },
   ];
