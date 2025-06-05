@@ -164,20 +164,35 @@ const AddProductCard = ({ mutateProducts }: { mutateProducts: () => void }) => {
     const token = window.localStorage.getItem("authToken") ?? "";
 
     try {
+      // Trim all string values
+      const trimmedData = {
+        ...data,
+        imageUrl: data.imageUrl?.trim() || "",
+        domainName: data.domainName.trim().replace(/^www\./, ""),
+        url: data.url.trim(),
+        description: data.description.trim(),
+        // Trim nested array objects
+        reviewers: data.reviewers.map(reviewer => ({
+          name: reviewer.name.trim(),
+          url: reviewer.url.trim()
+        })),
+        keywords: data.keywords.map(keyword => keyword.trim()),
+        categories: data.categories.map(category => category.trim())
+      };
+
       // Create FormData if we have a file
       if (selectedFile) {
         const formData = new FormData();
 
         // Add basic string fields
-        formData.append("url", data.url);
-        // Ensure domain name is properly formatted without www.
-        formData.append("domainName", data.domainName.replace(/^www\./, ""));
-        formData.append("description", data.description);
-        formData.append("rating", data.rating.toString());
-        formData.append("freeTrial", data.freeTrial.toString());
-        formData.append("reviewers", JSON.stringify(data.reviewers));
-        formData.append("keywords", JSON.stringify(data.keywords));
-        formData.append("categories", JSON.stringify(data.categories));
+        formData.append("url", trimmedData.url);
+        formData.append("domainName", trimmedData.domainName);
+        formData.append("description", trimmedData.description);
+        formData.append("rating", trimmedData.rating.toString());
+        formData.append("freeTrial", trimmedData.freeTrial.toString());
+        formData.append("reviewers", JSON.stringify(trimmedData.reviewers));
+        formData.append("keywords", JSON.stringify(trimmedData.keywords));
+        formData.append("categories", JSON.stringify(trimmedData.categories));
 
         // Add the file last
         formData.append("image", selectedFile);
@@ -186,15 +201,15 @@ const AddProductCard = ({ mutateProducts }: { mutateProducts: () => void }) => {
       } else {
         // If no file, send as regular JSON
         const transformedData = {
-          imageURL: selectedFile ? "" : data.imageUrl || "",
-          domainName: data.domainName.replace(/^www\./, ""),
-          url: data.url,
-          description: data.description,
-          rating: data.rating,
-          freeTrialAvailable: data.freeTrial,
-          categories: data.categories,
-          reviewers: data.reviewers,
-          keywords: data.keywords,
+          imageURL: selectedFile ? "" : trimmedData.imageUrl,
+          domainName: trimmedData.domainName,
+          url: trimmedData.url,
+          description: trimmedData.description,
+          rating: trimmedData.rating,
+          freeTrialAvailable: trimmedData.freeTrial,
+          categories: trimmedData.categories,
+          reviewers: trimmedData.reviewers,
+          keywords: trimmedData.keywords,
         };
         await productsApi.createProduct(token, transformedData);
       }

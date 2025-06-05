@@ -1,10 +1,8 @@
 "use client";
 
-import React from "react";
-
-const Banner = () => {
+const Guide = () => {
   return (
-    <div className="w-full bg-blue-500/10 py-2 border-y border-blue-500/20">
+    <div className="w-fit bg-blue-500/10 rounded-md py-2 pl-2 pr-4 border border-dashed border-blue-500 border-blue-500/20">
       <div className="container mx-auto flex justify-center items-center hover:underline ">
         <a
           href="/Comprehensive Guide To Affiliate Programs.pdf"
@@ -28,8 +26,8 @@ const Banner = () => {
               <line x1="12" y1="15" x2="12" y2="3"></line>
             </svg>
           </div>
-          <span className="font-medium">
-            Free Comprehensive Guide To Affiliate Marketing
+          <span className="font-medium text-center whitespace-nowrap">
+            Free Comprehensive Guide To <br /> Affiliate Marketing
           </span>
         </a>
       </div>
@@ -37,4 +35,4 @@ const Banner = () => {
   );
 };
 
-export default Banner;
+export default Guide;
