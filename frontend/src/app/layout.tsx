@@ -27,6 +27,9 @@ export const metadata: Metadata = {
     title: APP_CONFIG.APP_NAME,
     description: APP_CONFIG.APP_DESCRIPTION,
   },
+  other: {
+    'p:domain_verify': 'd46097ce66114fa9f72f79c69e26210c',
+  },
 };
 
 export default function RootLayout({

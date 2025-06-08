@@ -34,7 +34,7 @@ const Header = ({
           </h1>
           <Guide />
         </div>
-        <div className="relative h-full w-3/4 px-10">
+        <div className="relative h-full w-[65%] px-10">
           <Image
             src={"/banner.png"}
             fill
