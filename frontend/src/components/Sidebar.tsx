@@ -1,7 +1,7 @@
+import { API_BASE_URL } from "@/lib/config";
 import { cn, fetcher } from "@/lib/utils";
 import useSWR from "swr";
 import LoadingSpinner from "./LoadingSpinner";
-import { API_BASE_URL } from "@/lib/config";
 import { Button } from "./ui/button";
 
 const Sidebar = ({
@@ -47,7 +47,7 @@ const Sidebar = ({
           </Button>
         )}
       </div>
-      <ul className="space-y-1 md:space-y-2 overflow-y-auto flex-grow max-h-[calc(100vh-220px)] pb-20 md:pb-0">
+      <ul className="space-y-1 md:space-y-2 overflow-y-auto overflow-x-hidden flex-grow max-h-[calc(100vh-220px)] pb-20 md:pb-0">
         {categories
           ?.sort((a, b) => a.category.localeCompare(b.category))
           ?.map((category, index) => (
@@ -61,7 +61,7 @@ const Sidebar = ({
                   : "hover:bg-gray-100 hover:text-blue-500"
               )}
             >
-              <span className="text-sm md:text-base">
+              <span className="text-sm md:text-base truncate max-w-[150px] md:max-w-[180px]">
                 {category.category} ({category.count})
               </span>
               {selectedCategory === category.category && <span>✓</span>}

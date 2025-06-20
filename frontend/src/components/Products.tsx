@@ -11,11 +11,13 @@ const Products = ({
   productsLoading,
   productsError,
   mutateProducts,
+  selectedCategory,
 }: {
   products: Product[];
   productsLoading: boolean;
   productsError: Error | null;
   mutateProducts: () => void;
+  selectedCategory: string | null;
 }) => {
   const { isAuthenticated } = useAuth();
 
@@ -44,7 +46,7 @@ const Products = ({
     <div className="flex-1 w-full pb-6">
       <div className="flex flex-col sm:flex-row justify-between items-center px-4 sm:px-5">
         <h3 className="scroll-m-20 text-xl md:text-2xl font-semibold tracking-tight my-3 sm:my-5">
-          Tool
+          {selectedCategory ? selectedCategory : "Tools"}
         </h3>
         {isAuthenticated && <AddProductCard mutateProducts={mutateProducts} />}
       </div>
