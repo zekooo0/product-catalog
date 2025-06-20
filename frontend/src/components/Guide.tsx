@@ -26,7 +26,7 @@ const Guide = () => {
               <line x1="12" y1="15" x2="12" y2="3"></line>
             </svg>
           </div>
-          <span className="font-medium text-center whitespace-nowrap">
+          <span className="font-medium text-center xl:whitespace-nowrap">
             Free Comprehensive Guide To <br /> Affiliate Marketing
           </span>
         </a>

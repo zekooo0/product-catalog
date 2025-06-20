@@ -1,6 +1,5 @@
 "use client";
 import { useAuth } from "@/contexts/auth-context";
-import Image from "next/image";
 import Link from "next/link";
 import AlphabetFilter from "./AlphabetFilter";
 import Guide from "./Guide";
@@ -9,6 +8,8 @@ import SocialIcons from "./SocialIcons";
 import { ModeToggle } from "./theme-toggle";
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
+import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
+import { Menu } from "lucide-react";
 
 const Header = ({
   selectedLetter,
@@ -24,52 +25,79 @@ const Header = ({
   const { isAuthenticated, logout, user } = useAuth();
 
   return (
-    <div className="flex flex-col gap-5 p-5 sticky top-0 z-50 bg-background">
-      <div className="flex items-start justify-between gap-20 mb-10">
-        <div className="flex flex-col gap-4">
-          <h1 className="scroll-m-20 text-2xl font-extrabold tracking-tight lg:text-3xl">
-            <Link href="/" className="text-blue-500">
-              AffiliateList.Site
-            </Link>
-          </h1>
-          <Guide />
-        </div>
-        <div className="relative h-full w-1/2 px-10">
-          <Image
-            src={"/banner.png"}
-            fill
-            className="object-cover"
-            alt="banner"
-          />
-        </div>
-        <div className="flex flex-col gap-4 items-end">
-          <div className="flex items-center gap-2">
-            <ModeToggle />
-            {isAuthenticated ? (
-              <div className="flex items-center gap-2">
-                <span>Welcome, {user?.name}</span>
-                <Button onClick={logout}>Logout</Button>
+    <div className="flex flex-col gap-5 p-3 sm:p-5 sticky top-0 z-50 bg-background">
+      {/* Header top section */}
+      <div className="flex items-center justify-between gap-4 mb-4">
+        {/* Logo section */}
+        <h1 className="scroll-m-20 text-xl sm:text-2xl font-extrabold tracking-tight lg:text-3xl">
+          <Link href="/" className="text-blue-500">
+            AffiliateList.Site
+          </Link>
+        </h1>
+
+        {/* Hamburger Menu */}
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <Menu className="h-6 w-6" />
+              <span className="sr-only">Toggle menu</span>
+            </Button>
+          </SheetTrigger>
+          <SheetContent>
+            <div className="flex flex-col gap-6 pt-6">
+              {/* Authentication */}
+              <div className="flex flex-col gap-2">
+                <h3 className="text-lg font-semibold">Account</h3>
+                {isAuthenticated ? (
+                  <div className="flex flex-col gap-2">
+                    <span>Welcome, {user?.name}</span>
+                    <Button onClick={logout}>Logout</Button>
+                  </div>
+                ) : (
+                  <Button asChild>
+                    <Link href="/login">Login</Link>
+                  </Button>
+                )}
               </div>
-            ) : (
-              <Button asChild>
-                <Link href="/login">Login</Link>
-              </Button>
-            )}
-          </div>
-          <SocialIcons />
-        </div>
+
+              {/* Theme Toggle */}
+              <div className="flex flex-col gap-2">
+                <h3 className="text-lg font-semibold">Theme</h3>
+                <ModeToggle />
+              </div>
+
+              {/* Comprehensive Guide */}
+              <div className="flex flex-col gap-2">
+                <h3 className="text-lg font-semibold">Resources</h3>
+                <Guide />
+              </div>
+
+              {/* Social Icons */}
+              <div className="flex flex-col gap-2">
+                <h3 className="text-lg font-semibold">Follow Us</h3>
+                <SocialIcons />
+              </div>
+            </div>
+          </SheetContent>
+        </Sheet>
       </div>
-      <div className=" flex flex-col items-center justify-between  gap-5">
+
+      {/* Search and filters */}
+      <div className="flex flex-col items-center justify-between gap-3 sm:gap-5 w-full">
         <Search
           setSelectedLetter={setSelectedLetter}
           selectedLetter={selectedLetter}
           selectedCategory={selectedCategory}
         />
-        <AlphabetFilter
-          setSelectedLetter={setSelectedLetter}
-          selectedLetter={selectedLetter}
-          setSelectedCategory={setSelectedCategory}
-        />
+        <div className="w-full overflow-x-auto pb-2">
+          <div className="min-w-max">
+            <AlphabetFilter
+              setSelectedLetter={setSelectedLetter}
+              selectedLetter={selectedLetter}
+              setSelectedCategory={setSelectedCategory}
+            />
+          </div>
+        </div>
       </div>
       <Separator />
     </div>

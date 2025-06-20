@@ -1,10 +1,10 @@
 "use client";
 
 import { useAuth } from "@/contexts/auth-context";
-import AddProductCard from "./AddProductCard";
-import ProductCard from "./ProductCard";
 import { Product } from "@/lib/types";
+import AddProductCard from "./AddProductCard";
 import LoadingSpinner from "./LoadingSpinner";
+import ProductCard from "./ProductCard";
 
 const Products = ({
   products,
@@ -41,14 +41,14 @@ const Products = ({
   }
 
   return (
-    <div className="flex-1">
-      <div className="flex justify-between items-center px-5">
-        <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight my-5">
+    <div className="flex-1 w-full pb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-center px-4 sm:px-5">
+        <h3 className="scroll-m-20 text-xl md:text-2xl font-semibold tracking-tight my-3 sm:my-5">
           Tool
         </h3>
         {isAuthenticated && <AddProductCard mutateProducts={mutateProducts} />}
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 px-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3  gap-3 sm:gap-4 px-3 sm:px-5">
         {products
           ?.sort((a, b) => b.rating - a.rating)
           ?.map((product) => (

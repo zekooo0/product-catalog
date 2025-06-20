@@ -33,19 +33,21 @@ const Sidebar = ({
   }
 
   return (
-    <div className="sticky top-0 left-0 max-h-[70vh] p-5 min-w-[200px] border-r flex flex-col overflow-hidden">
+    <div className="sticky top-0 left-0 h-full md:max-h-[70vh] p-4 md:p-5 w-full md:min-w-[200px] md:max-w-[250px] md:border-r flex flex-col overflow-hidden bg-background">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">Categories</h2>
+        <h2 className="text-xl md:text-2xl font-bold">Categories</h2>
         {selectedCategory && (
           <Button
             onClick={() => onCategorySelect(null)}
-            className="text-md cursor-pointer bg-gray-500 dark:bg-white px-2 py-1 rounded-md transition-colors text-blue-700 hover:text-blue-800 hover:bg-gray-100"
+            size="sm"
+            variant="outline"
+            className="text-sm md:text-md cursor-pointer transition-colors"
           >
             Clear
           </Button>
         )}
       </div>
-      <ul className="space-y-2 overflow-y-auto flex-grow">
+      <ul className="space-y-1 md:space-y-2 overflow-y-auto flex-grow max-h-[calc(100vh-220px)] pb-20 md:pb-0">
         {categories
           ?.sort((a, b) => a.category.localeCompare(b.category))
           ?.map((category, index) => (
@@ -53,13 +55,13 @@ const Sidebar = ({
               key={index}
               onClick={() => onCategorySelect(category.category)}
               className={cn(
-                "cursor-pointer capitalize rounded-md transition-colors flex justify-between",
+                "cursor-pointer capitalize rounded-md transition-colors flex justify-between p-2",
                 selectedCategory === category.category
                   ? "bg-blue-500 text-white"
                   : "hover:bg-gray-100 hover:text-blue-500"
               )}
             >
-              <span>
+              <span className="text-sm md:text-base">
                 {category.category} ({category.count})
               </span>
               {selectedCategory === category.category && <span>✓</span>}
