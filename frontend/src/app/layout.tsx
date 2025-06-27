@@ -27,8 +27,10 @@ export const metadata: Metadata = {
     title: APP_CONFIG.APP_NAME,
     description: APP_CONFIG.APP_DESCRIPTION,
   },
+
   other: {
-    'p:domain_verify': 'd46097ce66114fa9f72f79c69e26210c',
+    "p:domain_verify": "d46097ce66114fa9f72f79c69e26210c",
+    "fo-verify": "9ab96df3-bbb3-4ae7-b1cc-14ae5b344ce7",
   },
 };
 
