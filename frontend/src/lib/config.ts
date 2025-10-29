@@ -5,7 +5,10 @@
 import { getEnv } from './env-validator';
 
 // API Configuration
-export const API_BASE_URL = getEnv('NEXT_PUBLIC_API_URL', 'https://product-catalog-core.vercel.app/api');
+export const API_BASE_URL = getEnv(
+  'NEXT_PUBLIC_API_URL',
+  'https://product-catalog-omega-olive.vercel.app/api'
+);
 
 // Feature Flags
 export const FEATURES = {
