@@ -5,7 +5,7 @@ import Products from "@/components/Products";
 import Sidebar from "@/components/Sidebar";
 import { useProducts } from "@/hooks/useProducts";
 import { Menu, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "./ui/button";
 
 export default function ProductsPage() {
@@ -21,25 +21,6 @@ export default function ProductsPage() {
 
   // State for mobile sidebar visibility
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
-
-  useEffect(() => {
-    // define a custom handler function
-    // for the contextmenu event
-    const handleContextMenu = (e: MouseEvent) => {
-      // prevent the right-click menu from appearing
-      e.preventDefault();
-    };
-
-    // attach the event listener to
-    // the document object
-    document.addEventListener("contextmenu", handleContextMenu);
-
-    // clean up the event listener when
-    // the component unmounts
-    return () => {
-      document.removeEventListener("contextmenu", handleContextMenu);
-    };
-  }, []);
 
   // Close sidebar when a category is selected on mobile
   const handleMobileCategorySelect = (category: string | null) => {
